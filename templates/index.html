@@ -1,8 +1,8 @@
-<!-- index.html -->
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Smart Home Monitor</title>
@@ -11,7 +11,8 @@
       font-family: Arial, sans-serif;
       margin: 20px;
       background: #212121;
-      
+      width: 70%;
+      height: 100%;
     }
 
     header {
@@ -19,10 +20,10 @@
       margin-bottom: 50px;
       color: rgb(247, 234, 215);
     }
-    h3,p  {
-
+    h3, p {
       color: rgb(247, 234, 215);
     }
+
     .grid {
       display: flex;
       grid-template-columns: repeat(3, 2fr);
@@ -31,7 +32,6 @@
     }
 
     .card {
-      
       padding-left: 20px;
       padding-right: 20px;
       width: 100px;
@@ -42,8 +42,12 @@
                   -10px -10px 30px rgb(60, 60, 60);
     }
 
-
+    .chart-container {
+      width: 100%;
+      height: 100px;
+    }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <header>
@@ -54,10 +58,27 @@
     {% for sensor, data in sensor_data.items() %}
       <div class="card">
         <h3>{{ sensor }}</h3>
-        <p>Value: {{ data.value }} {{ data.unit }}</p>
+        <p>Value: <span id="{{ sensor }}Value">{{ data.value }}</span> {{ data.unit }}</p>
+        <div class="chart-container">
+          <canvas id="{{ sensor }}Chart"></canvas>
+        </div>
       </div>
     {% endfor %}
   </div>
+
+  <script>
+    function updateData() {
+      fetch('/data')
+        .then(response => response.json())
+        .then(data => {
+          Object.keys(data).forEach(sensor => {
+            document.getElementById(`${sensor}Value`).innerText = data[sensor].value;
+          });
+        });
+    }
+
+    setInterval(updateData, 1500); 
+  </script>
 
 </body>
 </html>
