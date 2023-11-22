@@ -1,16 +1,22 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Smart Home Monitor</title>
   <style>
-    body {
+    body.dark-mode{
       font-family: Arial, sans-serif;
       margin: 20px;
-      background: #212121;
+      background: #ffffff; /* Белый фон для светлой темы */
+      width: 70%;
+      height: 100%;
+    }
+
+    body.light-mode {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #212121; /* Тёмный фон для тёмной темы */
       width: 70%;
       height: 100%;
     }
@@ -20,6 +26,7 @@
       margin-bottom: 50px;
       color: rgb(247, 234, 215);
     }
+
     h3, p {
       color: rgb(247, 234, 215);
     }
@@ -46,14 +53,69 @@
       width: 100%;
       height: 100px;
     }
+    .container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+    }
+
+    .container {
+    display: block;
+    position: relative;
+    cursor: pointer;
+    font-size: 25px;
+    user-select: none;
+    }
+
+    .checkmark {
+    position: relative;
+    top: 0;
+    left: 0;
+    height: 1.3em;
+    width: 1.3em;
+    background: black;
+    border-radius: 50px;
+    transition: all 0.7s;
+    --spread: 20px;
+    }
+
+    .container input:checked ~ .checkmark {
+    background: black;
+    box-shadow: -10px -10px var(--spread) 0px #5B51D8, 0 -10px var(--spread) 0px #833AB4, 10px -10px var(--spread) 0px #E1306C, 10px 0 var(--spread) 0px #FD1D1D, 10px 10px var(--spread) 0px #F77737, 0 10px var(--spread) 0px #FCAF45, -10px 10px var(--spread) 0px #FFDC80;
+    }
+
+    .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+    }
+
+    .container input:checked ~ .checkmark:after {
+    display: block;
+    }
+
+    .container .checkmark:after {
+    left: 0.45em;
+    top: 0.25em;
+    width: 0.25em;
+    height: 0.5em;
+    border: solid #f0f0f0;
+    border-width: 0 0.15em 0.15em 0;
+    transform: rotate(45deg);
+    }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
+<body class="light-mode">
   <header>
     Smart Home Monitor
   </header>
-
+  <label class="container">
+    <input checked="checked" type="checkbox">
+    <div class="checkmark"></div>
+  </label>
   <div class="grid">
     {% for sensor, data in sensor_data.items() %}
       <div class="card">
@@ -78,6 +140,19 @@
     }
 
     setInterval(updateData, 1500); 
+
+    // Добавляем переключатель темы
+    const body = document.body;
+    const themes = ['light-mode', 'dark-mode'];
+    let currentThemeIndex = 0;
+
+    function toggleTheme() {
+      currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+      body.className = themes[currentThemeIndex];
+    }
+
+    // Вызываем toggleTheme при клике на body
+    checkmark.addEventListener('click', toggleTheme);
   </script>
 
 </body>
