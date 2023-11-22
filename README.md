@@ -52,13 +52,13 @@ Smart Home Monitor is a web application that allows you to monitor and visualize
     ```
 
 4. Apply command Line Arguments
-```
-FLAGS:
-        --ip <ip>                            IP address to build [default: 127.0.0.1]
-        --port <port>                        Port number [default: 5000]
-        --silent                             No output to console
-        --help                               Guess what)
-```
+    ```bash
+    FLAGS:
+            --ip <ip>                            IP address to build [default: 127.0.0.1]
+            --port <port>                        Port number [default: 5000]
+            --silent                             No output to console
+            --help                               Guess what)
+    ```
 5. Access the application in your web browser by default at [http://127.0.0.1:5000/](http://127.0.0.1:5000/)
 
 ## Usage
