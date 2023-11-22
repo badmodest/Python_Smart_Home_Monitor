@@ -1,7 +1,7 @@
 from flask import Flask, render_template
 import paho.mqtt.client as mqtt
 import json
-
+import sys
 app = Flask(__name__)
 
 
@@ -52,3 +52,25 @@ def get_data():
 
 if __name__ == "__main__":
     app.run(debug=True)
+if __name__ == '__main__':
+    ip_address = '127.0.0.1'            #Set Default to your own IP instead of localhost
+    port = 5000                         #Set Default to the desired port instead of the default port
+    silent = False                      #Set True if no logging is required by default
+    
+
+    for i in range(1, len(sys.argv), 2):
+
+        if sys.argv[i] == '--ip':
+            ip_address = sys.argv[i + 1]
+        elif sys.argv[i] == '--port':
+            port = int(sys.argv[i + 1])
+        elif sys.argv[i] == '--silent':
+            silent = True
+
+    if not silent:
+        app.run(host=ip_address, port=port)
+    else:
+        import logging
+        log = logging.getLogger('werkzeug')
+        log.setLevel(logging.ERROR)
+        app.run(host=ip_address, port=port, use_reloader=False)
