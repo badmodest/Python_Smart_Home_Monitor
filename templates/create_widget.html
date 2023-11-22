@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Widget</title>
+</head>
+<body>
+  <h1>Create YAML Widget</h1>
+
+  <form method="post">
+    <div style="float: left; width: 50%;">
+      <textarea name="yaml_content" rows="10" style="width: 100%;">{{ yaml_content }}</textarea>
+      <br>
+      <span style="color: red;">{{ error }}</span>
+    </div>
+
+    <div style="float: left; width: 50%;">
+      <h2>Widget Preview</h2>
+      <pre>{{ yaml_content }}</pre>
+    </div>
+
+    <div style="clear: both;"></div>
+
+    <button type="submit">Add Widget</button>
+  </form>
+</body>
+</html>
