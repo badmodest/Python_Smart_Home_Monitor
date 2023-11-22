@@ -1,0 +1,75 @@
+<a name="readme-top"></a>
+<a name="Smart Home Monitor"></a>
+<br />
+<div>
+    <div align="center">
+        <img src="./favicon.ico" alt="Logo" width="100" height="100">
+    </div>
+
+### Smart Home Monitor
+
+## Overview
+
+Smart Home Monitor is a web application that allows you to monitor and visualize data from various sensors in your smart home. The application provides real-time updates and includes features such as charts to visualize historical sensor data.
+
+## Features
+
+- Real-time monitoring of sensor data
+- Visualization of sensor data with charts
+- Dark and light theme toggle
+- User-friendly interface for easy navigation
+
+## Screenshots
+
+<div align="center">
+    <img src="assets/screenshot1.png" width="75%" height="75%">
+</div>
+
+## Prerequisites
+
+- Python 3.x
+- Flask
+- Paho MQTT library (for MQTT integration)
+
+## Installation
+
+1. Clone the repository:
+
+    ```bash
+    git clone https://github.com/your-username/smart-home-monitor.git
+    ```
+
+2. Install dependencies:
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+3. Run the application:
+
+    ```bash
+    python app.py
+    ```
+
+4. Access the application in your web browser at [http://127.0.0.1:5000/](http://127.0.0.1:5000/)
+
+## Usage
+
+- Visit the home page to view real-time sensor data and charts.
+- Click on a specific sensor card to view a detailed chart for that sensor.
+
+## Contributing
+
+Feel free to contribute to the project by opening issues or submitting pull requests.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- [Chart.js](https://www.chartjs.org/) for the charting library
+- [Flask](https://flask.palletsprojects.com/) for the web framework
+- [Paho MQTT](https://www.eclipse.org/paho/) for MQTT integration
+
+[Back to Top](#readme-top)
