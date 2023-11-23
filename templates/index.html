@@ -9,17 +9,16 @@
     body.dark-mode{
       font-family: Arial, sans-serif;
       margin: 20px;
-      background: #ffffff; /* Белый фон для светлой темы */
-      width: 70%;
-      height: 100%;
+      background: #ffffff; 
+      display: flex;
     }
 
     body.light-mode {
       font-family: Arial, sans-serif;
       margin: 20px;
-      background: #212121; /* Тёмный фон для тёмной темы */
-      width: 70%;
-      height: 100%;
+      background: #212121; 
+      display: flex;
+
     }
 
     header {
@@ -32,23 +31,32 @@
       color: rgb(247, 234, 215);
     }
 
-    .grid {
-      display: flex;
-      grid-template-columns: repeat(3, 2fr);
-      grid-gap: 50px;
-      margin-block: 20px;
-    }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 2fr);
+  grid-gap: 70px;
+  margin-block: 30px;
+  padding-top: 50px;
+  position: absolute;
+  justify-content: center;
+  align-items: center;
+}
 
-    .card {
-      padding-left: 20px;
-      padding-right: 20px;
-      width: 100px;
-      height: 150px;
-      border-radius: 30px;
-      background: #212121;
-      box-shadow: 10px 10px 30px rgb(25, 25, 25),
-                  -10px -10px 30px rgb(60, 60, 60);
-    }
+.card {
+  padding: 20px;
+  width: 150px;
+  height: 125px;
+  border-radius: 30px;
+  background: #212121;
+  box-shadow: 10px 10px 30px rgb(25, 25, 25), -10px -10px 30px rgb(60, 60, 60);
+}
+
+
+@media screen and (max-width: 767px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
 
     .chart-container {
       width: 100%;
@@ -142,7 +150,6 @@
 
     setInterval(updateData, 1500); 
 
-    // Добавляем переключатель темы
     const body = document.body;
     const themes = ['light-mode', 'dark-mode'];
     let currentThemeIndex = 0;
@@ -152,7 +159,6 @@
       body.className = themes[currentThemeIndex];
     }
 
-    // Вызываем toggleTheme при клике на body
     checkmark.addEventListener('click', toggleTheme);
   </script>
 

@@ -13,7 +13,13 @@ sensor_data = {
     "Temp": {"value": 0, "unit": "Celsius"},
     "Value": {"value": 0, "unit": "Percentage"},
     "Pressure": {"value": 0, "unit": "hPa"},
+    "sensor1": {"value": 0, "unit": "NaN"},
+    "sensor2": {"value": 0, "unit": "NaN"},
+    "sensor3": {"value": 0, "unit": "NaN"},
     "sensor4": {"value": 0, "unit": "NaN"},
+    "sensor5": {"value": 0, "unit": "NaN"},
+    "sensor6": {"value": 0, "unit": "NaN"},
+    "sensor7": {"value": 0, "unit": "NaN"},
     "Battery": {"value": 0, "unit": "V"},
     "battery": {"value": 0, "unit": "Percent"},
 }
@@ -50,8 +56,7 @@ def index():
 def get_data():
     return json.dumps(sensor_data)
 
-if __name__ == "__main__":
-    app.run(debug=True)
+
 if __name__ == '__main__':
     ip_address = '127.0.0.1'            #Set Default to your own IP instead of localhost
     port = 5000                         #Set Default to the desired port instead of the default port
