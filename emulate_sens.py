@@ -11,14 +11,16 @@ sensor_topics = ["topic/Value", "topic/Pressure", "topic/sensor4", "topic/batter
 def emulate_sensors():
     while True:
         for topic in sensor_topics:
-                    sensor_value = round(random.uniform(0, 100), 2)
-        for topic in temp_topics:
-                    sensor_value = round(random.uniform(2,5),2)
+            sensor_value = round(random.uniform(0, 100), 2)
+            publish.single(topic, payload=str(sensor_value), hostname=mqtt_broker, port=mqtt_port)
+            print(f"Value sended: {sensor_value} to topic: {topic}")
 
- 
-        publish.single(topic, payload=str(sensor_value), hostname=mqtt_broker, port=mqtt_port)
-        print(f"Value sended: {sensor_value} to topic: {topic}")
-        time.sleep(10) 
+        for topic in temp_topics:
+            sensor_value = round(random.uniform(2, 5), 2)
+            publish.single(topic, payload=str(sensor_value), hostname=mqtt_broker, port=mqtt_port)
+            print(f"Value sended: {sensor_value} to topic: {topic}")
+
+        time.sleep(10)
 
 if __name__ == "__main__":
     emulate_sensors()

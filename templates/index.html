@@ -4,75 +4,120 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.css">
   <title>Smart Home Monitor</title>
   <style>
+
+    .fa-home { color: white; padding-right: 20px;}
+    .fa-chart-bar { color: white; padding-right: 20px;}
+    .fa-tachometer-alt { color: white; padding-right: 20px;}
+    .fa-sign-out-alt { color: white; padding-right: 20px;}
+
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       display: flex;
       height: 100vh;
       overflow: hidden;
-      background: #333333;
+      background: #333;
       transition: background 0.3s;
     }
-  
-    .side-menu {
-      width: 20%;
+
+    .bottom-menu {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
       background: #333;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      justify-content: space-around;
+      padding: 10px;
+    }
+
+    .bottom-menu a {
+      color: white;
+      text-decoration: none;
+      font-size: 2.5vw;
+    }
+
+    .side-menu {
+      width: 10%;
+      background: #333;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
       padding: 2%;
     }
-  
+
     .menu-header {
       color: #fff;
       font-size: 2vw;
       margin-bottom: 2%;
     }
-  
+
     .menu-item {
+      position: relative;
       color: #fff;
       text-decoration: none;
       padding: 1%;
       margin: 1% 0;
-      transition: background 0.3s, color 0.3s;
-      border-radius: 8px;
+      transition: color 0.3s;
+      z-index: 11; 
     }
-  
+    
+    .menu-item::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: calc(100% + 40px);
+      height: calc(100% + 40px);
+      background-color: transparent;
+      border-radius: 99px;
+      z-index: -1;
+      transition: background-color 0.3s;
+    }
+    
+    .menu-item:hover::before {
+      background-color: #22a1db;
+      opacity: 0.6;
+      z-index: 2; 
+    }
+    
     .menu-item:hover {
-      background: #555;
       color: #fff;
+      z-index: 1; 
     }
-  
+    
+
     .content {
       flex: 1;
       overflow-y: auto;
       padding: 2%;
       background: #181818;
-      border-radius: 2%;
+      border-radius: 20px;
     }
-  
+
     header {
       font-size: 2vw;
       margin-bottom: 2%;
       color: #c0c0c0;
     }
-  
+
     h3,
     p {
       color: #fff;
     }
-  
+
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       grid-gap: 2%;
       margin-block: 2%;
     }
-  
+
     .card {
       padding: 2%;
       border-radius: 2%;
@@ -80,12 +125,12 @@
       opacity: 0.8;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
-  
+
     .chart-container {
       width: 100%;
       height: 10vw;
     }
-  
+
     .container input {
       position: absolute;
       opacity: 0;
@@ -93,7 +138,7 @@
       height: 0;
       width: 0;
     }
-  
+
     .container {
       display: block;
       position: relative;
@@ -101,7 +146,6 @@
       font-size: 2.5vw;
       user-select: none;
     }
-  
 
   
     @media screen and (max-width: 767px) {
@@ -119,17 +163,164 @@
         text-align: center;
       }
     }
+    /* Extra small devices (phones, 600px and down) */
+@media only screen and (max-width: 600px) {
+  body {
+    font-size: 14px;
+  }
+
+  .side-menu {
+    display: none;
+  }
+
+  .bottom-menu {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .menu-item {
+    padding: 10px;
+  }
+
+  header {
+    font-size: 16px;
+  }
+
+  .container {
+    font-size: 16px;
+  }
+
+  .card {
+    padding: 10px;
+  }
+}
+
+/* Small devices (portrait tablets and large phones, 600px and up) */
+@media only screen and (min-width: 600px) {
+  body {
+    font-size: 16px;
+  }
+
+  .side-menu {
+    width: 20%;
+  }
+
+  .bottom-menu {
+    display: none;
+  }
+
+  header {
+    font-size: 20px;
+  }
+
+  .container {
+    font-size: 18px;
+  }
+
+  .card {
+    padding: 15px;
+  }
+}
+
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen and (min-width: 768px) {
+  body {
+    font-size: 18px;
+  }
+
+  .side-menu {
+    width: 10%;
+  }
+
+  .bottom-menu {
+    display: none;
+  }
+
+  header {
+    font-size: 24px;
+  }
+
+  .container {
+    font-size: 20px;
+  }
+
+  .card {
+    padding: 20px;
+  }
+}
+
+/* Large devices (laptops/desktops, 992px and up) */
+@media only screen and (min-width: 992px) {
+  body {
+    font-size: 20px;
+  }
+
+  .side-menu {
+    width: 10%;
+  }
+
+  .bottom-menu {
+    display: none;
+  }
+
+  header {
+    font-size: 28px;
+  }
+
+  .container {
+    font-size: 22px;
+  }
+
+  .card {
+    padding: 25px;
+  }
+}
+
+/* Extra large devices (large laptops and desktops, 1200px and up) */
+@media only screen and (min-width: 1200px) {
+  body {
+    font-size: 22px;
+  }
+
+  .side-menu {
+    width: 10%;
+  }
+
+  .bottom-menu {
+    display: none;
+  }
+
+  header {
+    font-size: 32px;
+  }
+
+  .container {
+    font-size: 24px;
+  }
+
+  .card {
+    padding: 30px;
+  }
+}
+
   </style>
   
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+  <div class="bottom-menu">
+    <a href="#" class="menu-item"><i class="fas fa-home fa-2x"></i></a>
+    <a href="#" class="menu-item"><i class="fas fa-chart-bar fa-2x"></i></a>
+    <a href="#" class="menu-item"><i class="fas fa-tachometer-alt fa-2x"></i></a>
+    <a href="/login" action="/login" class="menu-item"><i class="fas fa-sign-out-alt fa-2x"></i></a>
+  </div>
+
   <div class="side-menu">
     <div class="menu-header">Smart Home</div>
-    <a href="#" class="menu-item">Home</a>
-    <a href="#" class="menu-item">Overview</a>
-    <a href="#" class="menu-item">Dashboard</a>
-    <a href="/submit_form" action="/submit_form" class="menu-item">Log Out</a>
+    <a href="#" class="menu-item"><i class="fas fa-home fa-lg"></i>Home</a>
+    <a href="#" class="menu-item"><i class="fas fa-chart-bar fa-lg"></i>Overview</a>
+    <a href="/charts" class="menu-item"><i class="fas fa-tachometer-alt fa-lg"></i>Dashboard</a>
+    <a href="/login" action="/login" class="menu-item"><i class="fas fa-sign-out-alt fa-lg"></i>Log Out</a>
   </div>
   <div class="content">
     <header>Smart Home Monitor</header>
