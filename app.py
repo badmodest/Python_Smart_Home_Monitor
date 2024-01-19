@@ -1,9 +1,9 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for,session
 import paho.mqtt.client as mqtt
 import json
 import sys
 app = Flask(__name__)
-
+app.secret_key = 'your_secret_key'
 
 mqtt_broker = "127.0.0.1"
 mqtt_port = 1883
@@ -46,10 +46,32 @@ for sensor in sensor_data:
 
 mqtt_client.loop_start()
 
+@app.route('/submit_form', methods=['POST','GET'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        if username == 'admin' and password == 'admin':
+            session['logged_in'] = True
+            return redirect(url_for('index'))
+        else:
+            error_message = 'Неверные учетные данные. Пожалуйста, повторите вход.'
+            return render_template('login_form.html', error_message=error_message)
+
+    return render_template('login_form.html')
+
+@app.route("/logout")
+def logout():
+    session.pop('logged_in', None)
+    return redirect(url_for('login'))
 
 @app.route("/")
 def index():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
     return render_template("index.html", sensor_data=sensor_data)
+
 
 
 @app.route("/data")
@@ -58,7 +80,7 @@ def get_data():
 
 
 if __name__ == '__main__':
-    ip_address = '127.0.0.1'            #Set Default to your own IP instead of localhost
+    ip_address = '192.168.31.94'            #Set Default to your own IP instead of localhost
     port = 5000                         #Set Default to the desired port instead of the default port
     silent = False                      #Set True if no logging is required by default
     
