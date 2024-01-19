@@ -7,20 +7,21 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.css">
   <title>Smart Home Monitor</title>
   <style>
-
+    @import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;500&display=swap');
     .fa-home { color: white; padding-right: 20px;}
     .fa-chart-bar { color: white; padding-right: 20px;}
     .fa-tachometer-alt { color: white; padding-right: 20px;}
     .fa-sign-out-alt { color: white; padding-right: 20px;}
 
     body {
-      font-family: Arial, sans-serif;
+      font-family: "Work Sans", sans-serif;
       margin: 0;
       display: flex;
       height: 100vh;
       overflow: hidden;
       background: #333;
       transition: background 0.3s;
+      -webkit-font-smoothing: antialiased;
     }
 
     .bottom-menu {
@@ -77,17 +78,20 @@
       background-color: transparent;
       border-radius: 99px;
       z-index: -1;
-      transition: background-color 0.3s;
+      transition: all 0.3s;
     }
     
     .menu-item:hover::before {
       background-color: #22a1db;
       opacity: 0.6;
+      transition: all 0.5s;
       z-index: 2; 
     }
     
     .menu-item:hover {
       color: #fff;
+      transform: scale(0.9);
+      transition: all 0.5s;
       z-index: 1; 
     }
     
@@ -98,8 +102,9 @@
       padding: 2%;
       background: #181818;
       border-radius: 20px;
+      margin-block: 20px;
     }
-
+    /* Убрать мб */
     header {
       font-size: 2vw;
       margin-bottom: 2%;
@@ -113,38 +118,37 @@
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      grid-gap: 2%;
-      margin-block: 2%;
-    }
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      grid-gap: 4% 4%;
+      margin-block: 0%;
+      align-content: stretch;
+      justify-items: center;
+  }
 
     .card {
       padding: 2%;
-      border-radius: 2%;
-      background: #595959;
-      opacity: 0.8;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .chart-container {
-      width: 100%;
-      height: 10vw;
-    }
-
-    .container input {
-      position: absolute;
-      opacity: 0;
+      border-radius: 20px;
+      box-sizing: border-box;
+      width: 190px;
+      height: 254px;
+      background: #333333;
+      border: 1px solid #c0c0c0;
+      box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(6px);
       cursor: pointer;
-      height: 0;
-      width: 0;
-    }
-
-    .container {
-      display: block;
-      position: relative;
-      cursor: pointer;
-      font-size: 2.5vw;
+      transition: all 0.5s;
       user-select: none;
+      color: black;
+    }
+    
+    .card:hover {
+      border: 1px solid #287597;
+      transform: scale(1.1);
+      z-index: 10;
+    }
+    
+    .card:active {
+      transform: scale(0.95) rotateZ(1.7deg);
     }
 
   
@@ -182,16 +186,15 @@
     padding: 10px;
   }
 
-  header {
-    font-size: 16px;
-  }
-
-  .container {
-    font-size: 16px;
+  .content{
+    border-radius: 0px;
+    margin-block: 0px;
   }
 
   .card {
     padding: 10px;
+    width: 48vw;
+    height: 13vh;
   }
 }
 
@@ -209,13 +212,6 @@
     display: none;
   }
 
-  header {
-    font-size: 20px;
-  }
-
-  .container {
-    font-size: 18px;
-  }
 
   .card {
     padding: 15px;
@@ -236,13 +232,6 @@
     display: none;
   }
 
-  header {
-    font-size: 24px;
-  }
-
-  .container {
-    font-size: 20px;
-  }
 
   .card {
     padding: 20px;
@@ -263,13 +252,6 @@
     display: none;
   }
 
-  header {
-    font-size: 28px;
-  }
-
-  .container {
-    font-size: 22px;
-  }
 
   .card {
     padding: 25px;
@@ -290,13 +272,6 @@
     display: none;
   }
 
-  header {
-    font-size: 32px;
-  }
-
-  .container {
-    font-size: 24px;
-  }
 
   .card {
     padding: 30px;
@@ -323,19 +298,11 @@
     <a href="/login" action="/login" class="menu-item"><i class="fas fa-sign-out-alt fa-lg"></i>Log Out</a>
   </div>
   <div class="content">
-    <header>Smart Home Monitor</header>
-    <label class="container">
-      <input checked="checked" type="checkbox">
-      <div class="checkmark"></div>
-    </label>
     <div class="grid">
       {% for sensor, data in sensor_data.items() %}
         <div class="card">
           <h3>{{ sensor }}</h3>
           <p>Value: <span id="{{ sensor }}Value">{{ data.value }}</span> {{ data.unit }}</p>
-          <div class="chart-container">
-            <canvas id="{{ sensor }}Chart"></canvas>
-          </div>
         </div>
       {% endfor %}
     </div>
@@ -350,21 +317,16 @@
             document.getElementById(`${sensor}Value`).innerText = data[sensor].value;
           });
         });
+        var canvas = document.getElementById("canvas");
+        chartify(canvas, data);
+        var settings = {
+          "backgroundColor": "#333333", 
+          "chartColor": "#cdb3d5",
+          "chartLinesColor": "#fff",
+          "textColor": "#fff"
+      };
     }
 
-    setInterval(updateData, 1500);
-
-    const body = document.body;
-    const themes = ['light-mode', 'dark-mode'];
-    let currentThemeIndex = 0;
-
-    function toggleTheme() {
-      currentThemeIndex = (currentThemeIndex + 1) % themes.length;
-      body.className = themes[currentThemeIndex];
-    }
-
-    const checkmark = document.querySelector('.checkmark');
-    checkmark.addEventListener('click', toggleTheme);
-  </script>
+    setInterval(updateData, 5500);
 </body>
 </html>

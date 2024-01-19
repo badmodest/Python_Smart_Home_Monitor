@@ -48,6 +48,33 @@ for sensor in sensor_data:
 
 mqtt_client.loop_start()
 
+def update_sensor_values():
+    while True:
+        for sensor in sensor_data:
+            if sensor.startswith("sensor"):
+                sensor_data[sensor]["value"] = round(random.uniform(0, 100), 2)
+            elif sensor == "Temp":
+                sensor_data[sensor]["value"] = round(random.uniform(15, 30), 2)
+            elif sensor == "Battery":
+                sensor_data[sensor]["value"] = round(random.uniform(3.5, 4.2), 2)
+            elif sensor == "battery":
+                sensor_data[sensor]["value"] = round(random.uniform(0, 100), 2)
+            else:
+                sensor_data[sensor]["value"] = round(random.uniform(0, 100), 2)
+        
+        # Сохранение данных в CSV файл
+        save_to_csv(sensor_data)
+        
+        time.sleep(10)
+
+def save_to_csv(sensor_data):
+    with open('sensor_data.csv', 'w', newline='') as csvfile:
+        fieldnames = ['Sensor', 'Value', 'Unit']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+        writer.writeheader()
+        for sensor, data in sensor_data.items():
+            writer.writerow({'Sensor': sensor, 'Value': data['value'], 'Unit': data['unit']})
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -98,7 +125,6 @@ def login():
 
     return render_template('login_form.html')
 
-
 @app.route("/logout")
 def logout():
     session.pop('logged_in', None)
@@ -118,9 +144,6 @@ if __name__ == '__main__':
     ip_address = '192.168.31.94'        #Set Default to your own IP instead of localhost
     port = 5000                         #Set Default to the desired port instead of the default port
     silent = False                      #Set True if no logging is required by default
-    import threading
-    update_thread = threading.Thread(target=on_message)
-    update_thread.start()
     for i in range(1, len(sys.argv), 2):
         if sys.argv[i] == '--ip':
             ip_address = sys.argv[i + 1]

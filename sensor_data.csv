@@ -1,0 +1,13 @@
+Sensor,Value,Unit
+Temp,19.37,Celsius
+Value,86.26,Percentage
+Pressure,94.1,hPa
+sensor1,6.79,NaN
+sensor2,95.86,NaN
+sensor3,34.74,NaN
+sensor4,41.27,NaN
+sensor5,12.69,NaN
+sensor6,67.65,NaN
+sensor7,31.74,NaN
+Battery,4.09,V
+battery,17.03,Percent
