@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session,jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.serving import make_ssl_devcert
 
 import paho.mqtt.client as mqtt
 import json
@@ -11,7 +12,7 @@ import time
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
-passwords_file = 'passwords.txt'
+passwords_file = 'passwd'
 
 mqtt_broker = "127.0.0.1"
 mqtt_port = 1883
@@ -61,8 +62,7 @@ def update_sensor_values():
                 sensor_data[sensor]["value"] = round(random.uniform(0, 100), 2)
             else:
                 sensor_data[sensor]["value"] = round(random.uniform(0, 100), 2)
-        
-        # Сохранение данных в CSV файл
+
         save_to_csv(sensor_data)
         
         time.sleep(10)
@@ -97,30 +97,22 @@ def login():
         username = request.form['username']
         password = request.form['password']
         passwords = {}
-        print("1")
         try:
             with open(passwords_file, 'r') as file:
-                print("11")
                 for line in file:
-                    print("111")
                     parts = line.strip().split(':', 1)
                     if len(parts) == 2:
                         usernames, hashed_password = parts
                         passwords[usernames] = hashed_password
-                        print(f'Usernames: {usernames}, Hashed Password: {hashed_password}, Input Password: {password}')
-
         except FileNotFoundError:
             pass
 
         if username in passwords:
-            print(f'Username: {username}, Stored Password: {passwords[username]}, Input Password: {password}')
             if check_password_hash(passwords[username], password):
                 session['logged_in'] = True
                 return redirect(url_for('index'))
-
         else:
             error_message = 'Wrong password. Try again.'
-            print(f'Username: {username}, Password: {password}')
             return render_template('login_form.html', error_message=error_message)
 
     return render_template('login_form.html')
@@ -136,13 +128,25 @@ def index():
         return redirect(url_for('login'))
     return render_template("index.html", sensor_data=sensor_data)
 
+@app.route("/overview")
+def overview():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    return render_template("overview.html", sensor_data=sensor_data)
+
+@app.route("/charts")
+def charts():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    return render_template("charts.html", sensor_data=sensor_data)
+
 @app.route("/data")
 def get_data():
     return json.dumps(sensor_data)
 
 if __name__ == '__main__':
     ip_address = '192.168.31.94'        #Set Default to your own IP instead of localhost
-    port = 5000                         #Set Default to the desired port instead of the default port
+    port = 8443                         #Set Default to the desired port instead of the default port
     silent = False                      #Set True if no logging is required by default
     for i in range(1, len(sys.argv), 2):
         if sys.argv[i] == '--ip':
@@ -158,4 +162,4 @@ if __name__ == '__main__':
         import logging
         log = logging.getLogger('werkzeug')
         log.setLevel(logging.ERROR)
-        app.run(host=ip_address, port=port, use_reloader=False)
+        app.run(host=ip_address, port=port, use_reloader=False,  ssl_context='adhoc')

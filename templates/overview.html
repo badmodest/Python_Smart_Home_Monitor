@@ -6,21 +6,20 @@
   <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='/favicon.ico') }}">
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/styles.css') }}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.css">
-  <title>Smart Home Monitor</title>  
+  <title>Smart Home Monitor</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="bottom-menu">
-    <a href="#" class="menu-item"><i class="fas fa-home fa-2x"></i></a>
-    <a href="/overview" class="menu-item"><i class="fas fa-chart-bar fa-2x"></i></a>
+    <a href="/" class="menu-item"><i class="fas fa-home fa-2x"></i></a>
+    <a href="#" class="menu-item"><i class="fas fa-chart-bar fa-2x"></i></a>
     <a href="/charts" class="menu-item"><i class="fas fa-tachometer-alt fa-2x"></i></a>
     <a href="/login" action="/login" class="menu-item"><i class="fas fa-sign-out-alt fa-2x"></i></a>
   </div>
-
   <div class="side-menu">
     <div class="menu-header">Smart Home</div>
-    <a href="#" class="menu-item menu-item-active"><i class="fas fa-home fa-lg"></i>Home</a>
-    <a href="/overview" class="menu-item"><i class="fas fa-chart-bar fa-lg"></i>Overview</a>
+    <a href="/" class="menu-item"><i class="fas fa-home fa-lg"></i>Home</a>
+    <a href="#" class="menu-item menu-item-active"><i class="fas fa-chart-bar fa-lg"></i>Overview</a>
     <a href="/charts" class="menu-item"><i class="fas fa-tachometer-alt fa-lg"></i>Dashboard</a>
     <a href="/login" action="/login" class="menu-item"><i class="fas fa-sign-out-alt fa-lg"></i>Log Out</a>
   </div>
@@ -34,7 +33,6 @@
       {% endfor %}
     </div>
   </div>
-
   <script>
     function updateData() {
       fetch('/data')
@@ -54,6 +52,5 @@
       };
     }
     setInterval(updateData, 5500);
-  </script>
 </body>
 </html>
