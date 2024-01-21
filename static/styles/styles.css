@@ -1,8 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;500&display=swap');
-.fa-home { color: white; padding-right: 20px;}
-.fa-chart-bar { color: white; padding-right: 20px;}
-.fa-tachometer-alt { color: white; padding-right: 20px;}
-.fa-sign-out-alt { color: white; padding-right: 20px;}
+.fa-home { padding-right: 10px;}
+.fa-chart-bar { padding-right: 10px;}
+.fa-tachometer-alt { color: white; padding-right: 10px;}
+.fa-sign-out-alt { color: white; padding-right: 10px;}
+.fa-sign-in-alt {padding-right: 10px;}
+.fa-gear { padding-right: 10px;}
+
 
 :root {
   --main-bg-color:     #333333;
@@ -11,9 +14,21 @@
   --white:             #ffffff;
   --gray:              #c0c0c0;
   --black:             #000000;
-  --blue:              #2F81F7;
+  --blum:              #2F81F7;
+  --blue:              #87ceeb;
 }
-
+/*
+:root.dark-theme {
+  --main-bg-color:     #ffffff;
+  --secondary-bg-color:#e6e6e6;
+  --tertiary-bg-color: #b9b9b9;
+  --white:             #000000;
+  --gray:              #c0c0c0;
+  --black:             #ffffff;
+  --blum:              #2F81F7;
+  --blue:              #87ceeb;
+}
+*/
 body {
   font-family: "Work Sans", sans-serif;
   margin: 0;
@@ -85,16 +100,22 @@ body {
 
 .menu-item:hover::before {
   background-color: var(--blue);
+  color: var(--black);
   transition: all 0.5s;
-  z-index: -1; 
+  z-index: -1;
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
+  -ms-transition: all 0.5s;
+  -o-transition: all 0.5s;
 }
+
 /*
 .menu-item:active::before{
   transform: translate(-70%, -70%);
   }
   */
 .menu-item:hover {
-  color: var(--white);
+  color: var(--black);
   transform: scale(0.98);
   transition: all 0.5s;
   z-index: 1;
@@ -125,7 +146,7 @@ body {
 .content {
   flex: 1;
   overflow-y: auto;
-  padding: 2%;
+  padding: 0% 2% 2% 2%;
   background: var(--secondary-bg-color);
   border-radius: 20px;
   margin-block: 20px;
@@ -141,14 +162,14 @@ h3,
 p {
   color: var(--white);
 }
-
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   grid-gap: 4% 4%;
   margin-block: 0%;
   align-content: stretch;
   justify-items: center;
+
 }
 
 .card {
@@ -166,7 +187,18 @@ p {
   user-select: none;
   color: var(--black);
 }
-
+.icon-in-card {
+  position: absolute;
+  top: 10px; 
+  left: 10px; 
+  font-size: 24px;
+  color: #ff9800;
+}
+@media (max-width: 768px) {
+  .card {
+    grid-column: span 2; 
+  }
+}
 .card:hover {
   border: 1px solid var(--blue);
   transform: scale(1.1);
@@ -177,8 +209,45 @@ p {
   transform: scale(0.95) rotateZ(1.7deg);
 }
 hr.rounded {
-  border-top: 8px solid #bbb;
+  border-top: 1px solid #bbb;
   border-radius: 5px;
+  margin-bottom: 2%;
+}
+.settingsElement{
+color: var(--white)
+
+}
+
+.input,button {
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","Roboto","Oxygen","Ubuntu","Cantarell","Fira Sans","Droid Sans","Helvetica Neue",sans-serif;
+  font-weight: 500;
+  font-size: .8vw;
+  margin: 12px 10px 20px 0px;
+  color: var(--white);
+  background-color: rgb(28,28,30);
+  box-shadow: 0 0 .4vw rgba(0,0,0,0.5), 0 0 0 .15vw transparent;
+  border-radius: 0.4vw;
+  border: none;
+  outline: none;
+  width: 8vw;
+  padding: 0.4vw;
+  max-width: 190px;
+  transition: .4s;
+}
+
+.input,button:hover {
+  box-shadow: 0 0 0 .15vw rgba(135, 207, 235, 0.186);
+}
+
+.input,button:focus {
+  box-shadow: 0 0 0 .15vw var(--blue);
+}
+.save:before {
+  content: 'Save';
+}
+
+.saved:before {
+  content: 'Saved!';
 }
 /* 
 @media screen and (max-width: 767px) {
@@ -197,6 +266,12 @@ hr.rounded {
   }
 }
 */
+@media only screen and (max-width: 450px) {
+  .grid{
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+
+  }
+}
 /* Extra small devices (phones, 600px and down) */
 @media only screen and (max-width: 600px) {
   body {
@@ -220,11 +295,17 @@ hr.rounded {
     border-radius: 0px;
     margin-block: 0px;
   }
+  .grid{
+    grid-template-columns: repeat(auto-fit, minmax(69px, 1fr));
 
+  }
   .card {
     padding: 10px;
     width: 48vw;
     height: 13vh;
+  }
+  .menu-item:hover::before,.menu-item:hover,.menu-iteem-active::before,.menu-item-active::before,.card:hover,.card:active{
+    display: none;
   }
 }
 /* Small devices (portrait tablets and large phones, 600px and up) */

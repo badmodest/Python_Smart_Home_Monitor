@@ -9,21 +9,37 @@ import csv
 import random
 import time
 
+def read_settings():
+    try:
+        with open('settings.csv', mode='r', newline='') as csvfile:
+            reader = csv.reader(csvfile)
+            settings = {rows[0]: rows[1] for rows in reader}
+            return settings
+    except FileNotFoundError:
+        with open('settings.csv', mode='w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(['mqtt_broker', '127.0.0.1'])
+            writer.writerow(['mqtt_port', '1883'])
+        return {'mqtt_broker': '127.0.0.1', 'mqtt_port': '1883'}
+
+
+settings = read_settings()
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 passwords_file = 'passwd'
 
-mqtt_broker = "127.0.0.1"
-mqtt_port = 1883
+mqtt_broker = settings['mqtt_broker']
+mqtt_port = int(settings['mqtt_port'])
 hello_username = ""
 sensor_data = {
-    "Temp": {"value": 0, "unit": "°C"},
-    "Value": {"value": 0, "unit": "%"},
-    "Pressure": {"value": 0, "unit": "hPa"},
-    "sensor1": {"value": 0, "unit": "NaN"},
-    "Battery": {"value": 0, "unit": "V"},
-    "battery": {"value": 0, "unit": "%"},
+
+    "Temp": {"value": 25, "unit": "°C", "icon": "sun_max"},
+    "Value": {"value": 50, "unit": "%", "icon": "chart_bar_fill"},
+    "Pressure": {"value": 1015, "unit": "hPa", "icon": "tornado"},
+    "sensor1": {"value": 0, "unit": "NaN", "icon": "burn"},
+    "Battery": {"value": 0, "unit": "V", "icon": "bolt_horizontal_fill"},
+    "battery": {"value": 0, "unit": "%", "icon": "battery_25"},
 }
 
 def on_message(client, userdata, msg):
@@ -140,6 +156,26 @@ def charts():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     return render_template("charts.html", sensor_data=sensor_data)
+
+@app.route("/settings", methods=['GET', 'POST'])
+def settings_route():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        mqtt_broker = request.form['mqtt_broker']
+        mqtt_port = request.form['mqtt_port']
+
+        with open('settings.csv', mode='w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(['mqtt_broker', mqtt_broker])
+            writer.writerow(['mqtt_port', mqtt_port])
+
+        return redirect(url_for('index'))
+    else:
+        settings = read_settings()
+        return render_template("settings.html", mqtt_broker=settings['mqtt_broker'], mqtt_port=settings['mqtt_port'])
+
 
 @app.route("/data")
 def get_data():
