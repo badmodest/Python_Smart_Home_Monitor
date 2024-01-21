@@ -118,4 +118,15 @@ body {
     color: #fff;
     font-size: 14px;
   }
-  
+  /* Extra small devices (phones, 600px and down) */
+@media only screen and (max-width: 600px) {
+    .card {
+        height: 10vh;
+        width: 100vw;
+        gap: 55px;
+        background: opacity;
+        box-shadow: 0px 0px 0px #313131c3, 0px 0px 0px #212121c2;
+        border-radius: 0px;
+        padding: 50px;
+    }
+  }

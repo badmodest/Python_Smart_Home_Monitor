@@ -6,8 +6,9 @@
   <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='/favicon.ico') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/styles.css') }}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.css">
-  <title>Smart Home Monitor</title>
+  <script src="https://kit.fontawesome.com/7e84202197.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <title>Smart Home Monitor</title>
 </head>
 <body>
   <div class="bottom-menu">
@@ -22,7 +23,14 @@
     <a href="#" class="menu-item menu-item-active"><i class="fas fa-home fa-lg"></i>Home</a>
     <a href="/overview" class="menu-item"><i class="fas fa-chart-bar fa-lg"></i>Addit</a>
     <a href="/charts" class="menu-item"><i class="fas fa-tachometer-alt fa-lg"></i>Dash</a>
-    <a href="/login" action="/login" class="menu-item"><i class="fas fa-sign-out-alt fa-lg"></i>Log Out</a>
+    {% if not is_guest %}
+    <a href="/settings" class="menu-item"><i class="fas fa-gear fa-lg"></i>Settings</a>
+    {% endif %}
+    {% if hello_username == 'Guest' %}
+      <a href="/login" action="/login" class="menu-item"><i class="fas fa-sign-in-alt fa-lg"></i>Log In</a>
+    {% else %}
+      <a href="/logout" class="menu-item"><i class="fas fa-sign-out-alt fa-lg"></i>Log Out</a>
+    {% endif %}
   </div>
   <div class="content">
     <h3 class="heading">Hey, {{ hello_username }} 👋</h3>

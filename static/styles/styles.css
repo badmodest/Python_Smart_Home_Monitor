@@ -23,6 +23,7 @@ body {
   background: var(--main-bg-color);
   transition: background 0.3s;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .bottom-menu {
@@ -45,7 +46,7 @@ body {
   width: 7%;
   background: var(--main-bg-color);
   display: grid;
-  grid-template-rows: 11vh 8vh 8vh 8vh 110vh;
+  grid-template-rows: 11vh 8vh 8vh 8vh 8vh 90vh;
   align-items: center;
   justify-content: space-between;
   padding: 2% 2% 2% 1.3%;

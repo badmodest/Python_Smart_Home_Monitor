@@ -21,6 +21,7 @@
                     <span>Password</span>
                 </div>
                 <button type="submit" class="enter">Enter</button>
+                <a href="{{ url_for('index') }}?guest=true" class="enter">Guest</a>
                 <a href="{{ url_for('register') }}" class="register-link">Register</a>
             </div>
         </form>

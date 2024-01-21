@@ -18,12 +18,12 @@ mqtt_broker = "127.0.0.1"
 mqtt_port = 1883
 hello_username = ""
 sensor_data = {
-    "Temp": {"value": 0, "unit": "Celsius"},
-    "Value": {"value": 0, "unit": "Percentage"},
+    "Temp": {"value": 0, "unit": "°C"},
+    "Value": {"value": 0, "unit": "%"},
     "Pressure": {"value": 0, "unit": "hPa"},
     "sensor1": {"value": 0, "unit": "NaN"},
     "Battery": {"value": 0, "unit": "V"},
-    "battery": {"value": 0, "unit": "Percent"},
+    "battery": {"value": 0, "unit": "%"},
 }
 
 def on_message(client, userdata, msg):
@@ -114,15 +114,20 @@ def login():
 
 @app.route("/logout")
 def logout():
+    session.clear()
     session.pop('logged_in', None)
     return redirect(url_for('login'))
 
 @app.route("/")
 def index():
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
     hello_username = session.get('hello_username', 'Guest')
-    return render_template("index.html", sensor_data=sensor_data, hello_username=hello_username)
+    is_guest = (hello_username == 'Guest')
+
+    if request.args.get('guest') == 'true':
+        session['logged_in'] = True
+        session['hello_username'] = 'Guest'
+
+    return render_template("index.html", sensor_data=sensor_data, hello_username=hello_username, is_guest=is_guest)
 
 @app.route("/overview")
 def overview():
