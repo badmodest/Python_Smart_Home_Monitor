@@ -16,18 +16,12 @@ passwords_file = 'passwd'
 
 mqtt_broker = "127.0.0.1"
 mqtt_port = 1883
-
+hello_username = ""
 sensor_data = {
     "Temp": {"value": 0, "unit": "Celsius"},
     "Value": {"value": 0, "unit": "Percentage"},
     "Pressure": {"value": 0, "unit": "hPa"},
     "sensor1": {"value": 0, "unit": "NaN"},
-    "sensor2": {"value": 0, "unit": "NaN"},
-    "sensor3": {"value": 0, "unit": "NaN"},
-    "sensor4": {"value": 0, "unit": "NaN"},
-    "sensor5": {"value": 0, "unit": "NaN"},
-    "sensor6": {"value": 0, "unit": "NaN"},
-    "sensor7": {"value": 0, "unit": "NaN"},
     "Battery": {"value": 0, "unit": "V"},
     "battery": {"value": 0, "unit": "Percent"},
 }
@@ -64,7 +58,6 @@ def update_sensor_values():
                 sensor_data[sensor]["value"] = round(random.uniform(0, 100), 2)
 
         save_to_csv(sensor_data)
-        
         time.sleep(10)
 
 def save_to_csv(sensor_data):
@@ -91,12 +84,13 @@ def register():
 
     return render_template('register_form.html')
 
-@app.route('/login', methods=['POST','GET'])
+@app.route('/login', methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
         passwords = {}
+
         try:
             with open(passwords_file, 'r') as file:
                 for line in file:
@@ -110,6 +104,7 @@ def login():
         if username in passwords:
             if check_password_hash(passwords[username], password):
                 session['logged_in'] = True
+                session['hello_username'] = username
                 return redirect(url_for('index'))
         else:
             error_message = 'Wrong password. Try again.'
@@ -126,7 +121,8 @@ def logout():
 def index():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
-    return render_template("index.html", sensor_data=sensor_data)
+    hello_username = session.get('hello_username', 'Guest')
+    return render_template("index.html", sensor_data=sensor_data, hello_username=hello_username)
 
 @app.route("/overview")
 def overview():
@@ -146,7 +142,7 @@ def get_data():
 
 if __name__ == '__main__':
     ip_address = '192.168.31.94'        #Set Default to your own IP instead of localhost
-    port = 8443                         #Set Default to the desired port instead of the default port
+    port = 80                           #Set Default to the desired port instead of the default port
     silent = False                      #Set True if no logging is required by default
     for i in range(1, len(sys.argv), 2):
         if sys.argv[i] == '--ip':
@@ -162,4 +158,4 @@ if __name__ == '__main__':
         import logging
         log = logging.getLogger('werkzeug')
         log.setLevel(logging.ERROR)
-        app.run(host=ip_address, port=port, use_reloader=False,  ssl_context='adhoc')
+        app.run(host=ip_address, port=port, use_reloader=False)

@@ -4,13 +4,23 @@
 .fa-tachometer-alt { color: white; padding-right: 20px;}
 .fa-sign-out-alt { color: white; padding-right: 20px;}
 
+:root {
+  --main-bg-color:     #333333;
+  --secondary-bg-color:#181818;
+  --tertiary-bg-color: #505050;
+  --white:             #ffffff;
+  --gray:              #c0c0c0;
+  --black:             #000000;
+  --blue:              #2F81F7;
+}
+
 body {
   font-family: "Work Sans", sans-serif;
   margin: 0;
   display: flex;
   height: 100vh;
   overflow: hidden;
-  background: #333;
+  background: var(--main-bg-color);
   transition: background 0.3s;
   -webkit-font-smoothing: antialiased;
 }
@@ -20,38 +30,38 @@ body {
   position: fixed;
   bottom: 0;
   width: 100%;
-  background: #333;
+  background: var(--main-bg-color);
   z-index: 1000;
   justify-content: space-around;
   padding: 10px;
 }
 
 .bottom-menu a {
-  color: white;
+  color: var(--white);
   text-decoration: none;
   font-size: 2.5vw;
 }
 .side-menu {
-  width: 10%;
-  background: #333;
+  width: 7%;
+  background: var(--main-bg-color);
   display: grid;
-  grid-template-rows: 10vh 10vh 10vh 10vh 100vh;
+  grid-template-rows: 11vh 8vh 8vh 8vh 110vh;
   align-items: center;
   justify-content: space-between;
-  padding: 2%;
+  padding: 2% 2% 2% 1.3%;
 }
 
 .menu-header {
-  color: #fff;
+  color: var(--white);
   font-size: 1.6vh;
   margin-bottom: 2%;
 }
 
 .menu-item {
   position: relative;
-  color: #fff;
+  color: var(--white);
   text-decoration: none;
-  padding: 1%;
+  /*padding: 1%;*/
   margin: 1% 0;
   transition: color 0.3s;
   z-index: 11;
@@ -73,7 +83,7 @@ body {
 }
 
 .menu-item:hover::before {
-  background-color: #22a1db;
+  background-color: var(--blue);
   transition: all 0.5s;
   z-index: -1; 
 }
@@ -82,28 +92,40 @@ body {
   transform: translate(-70%, -70%);
   }
   */
-  .menu-item:hover {
-    color: #fff;
-    transform: scale(0.9);
-    transition: all 0.5s;
-    z-index: 1; 
-  }
-  
-.menu-item-active::before
+.menu-item:hover {
+  color: var(--white);
+  transform: scale(0.98);
+  transition: all 0.5s;
+  z-index: 1;
+}
+
+.menu-iteem-active::before
 {
   transform: translate(-50%, -50%);
   width: calc(100% + 30px);
   height: calc(100% + 30px);
   border-radius: 99px;
-  background-color: #505050;
+  background-color: var(--tertiary-bg-color);
   z-index: -1; 
+
+}
+
+.menu-item-active::before{
+  content: "";
+  position: absolute;
+  left: -10px;
+  width: 5px;
+  height: 100%;
+  background-color: var(--blue);
+  border-radius: 5px;
+
 
 }
 .content {
   flex: 1;
   overflow-y: auto;
   padding: 2%;
-  background: #181818;
+  background: var(--secondary-bg-color);
   border-radius: 20px;
   margin-block: 20px;
 }
@@ -111,12 +133,12 @@ body {
 header {
   font-size: 2vw;
   margin-bottom: 2%;
-  color: #c0c0c0;
+  color: var(--gray);
 }
 
 h3,
 p {
-  color: #fff;
+  color: var(--white);
 }
 
 .grid {
@@ -134,18 +156,18 @@ p {
   box-sizing: border-box;
   width: 190px;
   height: 254px;
-  background: #333333;
-  border: 1px solid #c0c0c0;
+  background: var(--main-bg-color);
+  border: 1px solid var(--gray);
   box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(6px);
   cursor: pointer;
   transition: all 0.5s;
   user-select: none;
-  color: black;
+  color: var(--black);
 }
 
 .card:hover {
-  border: 1px solid #287597;
+  border: 1px solid var(--blue);
   transform: scale(1.1);
   z-index: 10;
 }
@@ -153,6 +175,11 @@ p {
 .card:active {
   transform: scale(0.95) rotateZ(1.7deg);
 }
+hr.rounded {
+  border-top: 8px solid #bbb;
+  border-radius: 5px;
+}
+/* 
 @media screen and (max-width: 767px) {
   .grid {
     grid-template-columns: repeat(auto-fill, minmax(45%, 1fr));
@@ -168,7 +195,7 @@ p {
     text-align: center;
   }
 }
-
+*/
 /* Extra small devices (phones, 600px and down) */
 @media only screen and (max-width: 600px) {
   body {
@@ -206,7 +233,7 @@ p {
   }
 
   .side-menu {
-    width: 20%;
+    width: 7%;
   }
 
   .bottom-menu {
@@ -225,7 +252,7 @@ p {
   }
 
   .side-menu {
-    width: 10%;
+    width: 7%;
   }
 
   .bottom-menu {
@@ -244,7 +271,7 @@ p {
   }
 
   .side-menu {
-    width: 10%;
+    width: 7%;
   }
 
   .bottom-menu {
@@ -263,7 +290,7 @@ p {
   }
 
   .side-menu {
-    width: 10%;
+    width: 7%;
   }
 
   .bottom-menu {
