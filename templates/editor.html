@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+</head>
+<body>
+    <div class="container">
+        <h1>Редактор карточек</h1>
+        <label for="cardName">Имя карточки:</label>
+        <input type="text" id="cardName" required>
+
+        <label for="cardCode">Код карточки (YAML):</label>
+        <textarea id="cardCode" rows="10" required></textarea>
+
+        <div id="renderedCard">
+        </div>
+
+        <button onclick="saveCard()">Сохранить карточку</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+    <script>
+        function renderCard() {
+            const cardCode = document.getElementById('cardCode').value;
+            const renderedCard = document.getElementById('renderedCard');
+            try {
+                const cardData = jsyaml.load(cardCode);
+                const cardHTML = renderHTML(cardData);
+                renderedCard.innerHTML = cardHTML;
+            } catch (error) {
+                console.error("Ошибка при парсинге YAML:", error);
+            }
+        }
+
+        function renderHTML(data) {
+            if (typeof data === 'object') {
+                let result = '<div class="card">';
+                for (const key in data) {
+                    if (data.hasOwnProperty(key)) {
+                        result += `<div><strong>${key}:</strong> ${renderHTML(data[key])}</div>`;
+                    }
+                }
+                result += '</div>';
+                return result;
+            } else {
+                return data;
+            }
+        }
+
+        document.getElementById('cardCode').addEventListener('input', renderCard);
+
+        renderCard();
+    </script>
+</body>
+</html>

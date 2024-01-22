@@ -1,7 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for, session,jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
 from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug.serving import make_ssl_devcert
-
+import yaml
 import paho.mqtt.client as mqtt
 import json
 import sys
@@ -26,7 +25,7 @@ def read_settings():
 settings = read_settings()
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'
+app.secret_key = 'development key'
 passwords_file = 'passwd'
 
 mqtt_broker = settings['mqtt_broker']
@@ -38,8 +37,8 @@ sensor_data = {
     "Value": {"value": 50, "unit": "%", "icon": "chart_bar_fill"},
     "Pressure": {"value": 1015, "unit": "hPa", "icon": "tornado"},
     "sensor1": {"value": 0, "unit": "NaN", "icon": "burn"},
-    "Battery": {"value": 0, "unit": "V", "icon": "bolt_horizontal_fill"},
-    "battery": {"value": 0, "unit": "%", "icon": "battery_25"},
+    "Battery": {"value": 4.4, "unit": "V", "icon": "bolt_horizontal_fill"},
+    "battery": {"value": 69, "unit": "%", "icon": "battery_25"},
 }
 
 def on_message(client, userdata, msg):
@@ -59,31 +58,57 @@ for sensor in sensor_data:
 
 mqtt_client.loop_start()
 
-def update_sensor_values():
-    while True:
-        for sensor in sensor_data:
-            if sensor.startswith("sensor"):
-                sensor_data[sensor]["value"] = round(random.uniform(0, 100), 2)
-            elif sensor == "Temp":
-                sensor_data[sensor]["value"] = round(random.uniform(15, 30), 2)
-            elif sensor == "Battery":
-                sensor_data[sensor]["value"] = round(random.uniform(3.5, 4.2), 2)
-            elif sensor == "battery":
-                sensor_data[sensor]["value"] = round(random.uniform(0, 100), 2)
-            else:
-                sensor_data[sensor]["value"] = round(random.uniform(0, 100), 2)
+# def update_sensor_values():
+#     while True:
+#         for sensor in sensor_data:
+#             if sensor.startswith("sensor"):
+#                 sensor_data[sensor]["value"] = round(random.uniform(0, 100), 2)
+#             elif sensor == "Temp":
+#                 sensor_data[sensor]["value"] = round(random.uniform(15, 30), 2)
+#             elif sensor == "Battery":
+#                 sensor_data[sensor]["value"] = round(random.uniform(3.5, 4.2), 2)
+#             elif sensor == "battery":
+#                 sensor_data[sensor]["value"] = round(random.uniform(0, 100), 2)
+#             else:
+#                 sensor_data[sensor]["value"] = round(random.uniform(0, 100), 2)
 
-        save_to_csv(sensor_data)
-        time.sleep(10)
+#         save_to_csv(sensor_data)
+#         time.sleep(10)
 
-def save_to_csv(sensor_data):
-    with open('sensor_data.csv', 'w', newline='') as csvfile:
-        fieldnames = ['Sensor', 'Value', 'Unit']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+# def save_to_csv(sensor_data):
+#     with open('sensor_data.csv', 'w', newline='') as csvfile:
+#         fieldnames = ['Sensor', 'Value', 'Unit']
+#         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
-        writer.writeheader()
-        for sensor, data in sensor_data.items():
-            writer.writerow({'Sensor': sensor, 'Value': data['value'], 'Unit': data['unit']})
+#         writer.writeheader()
+#         for sensor, data in sensor_data.items():
+#             writer.writerow({'Sensor': sensor, 'Value': data['value'], 'Unit': data['unit']})
+
+
+
+##################################
+
+@app.route('/editor')
+def editor():
+    return render_template('editor.html')
+
+@app.route('/save_card', methods=['POST'])
+def save_card():
+    data = request.get_json()
+    card_name = data.get('name')
+    card_code = data.get('code')
+
+    file_path = f'cards/{card_name.lower()}.yaml'
+    with open(file_path, 'w') as file:
+        file.write(card_code)
+
+    return jsonify({'success': True, 'message': 'Карточка успешно сохранена'})
+
+##################################
+
+
+
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -180,6 +205,11 @@ def settings_route():
 @app.route("/data")
 def get_data():
     return json.dumps(sensor_data)
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
 
 if __name__ == '__main__':
     ip_address = '192.168.31.94'        #Set Default to your own IP instead of localhost
