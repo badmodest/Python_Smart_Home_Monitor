@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
+from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 import yaml
 import paho.mqtt.client as mqtt
@@ -31,6 +32,8 @@ passwords_file = 'passwd'
 mqtt_broker = settings['mqtt_broker']
 mqtt_port = int(settings['mqtt_port'])
 hello_username = ""
+status = "Offline"
+last_update_time = datetime.now()
 sensor_data = {
 
     "Temp": {"value": 25, "unit": "°C", "icon": "sun_max"},
@@ -42,11 +45,14 @@ sensor_data = {
 }
 
 def on_message(client, userdata, msg):
+    global last_update_time
     try:
         sensor_name = msg.topic.split("/")[-1]
         sensor_data[sensor_name]["value"] = float(msg.payload.decode("utf-8"))
+        last_update_time = datetime.now()
     except Exception as e:
         print(f"Error processing MQTT message: {e}")
+
 
 mqtt_client = mqtt.Client()
 mqtt_client.on_message = on_message
@@ -161,6 +167,16 @@ def logout():
 
 @app.route("/")
 def index():
+    global status, last_update_time
+
+    time_difference = datetime.now() - last_update_time
+    if time_difference.total_seconds() > 10:
+        status = "Offline"
+        print("like")
+    else:
+        status = "Online"
+        print("dislike")
+
     hello_username = session.get('hello_username', 'Guest')
     is_guest = (hello_username == 'Guest')
 
@@ -168,7 +184,7 @@ def index():
         session['logged_in'] = True
         session['hello_username'] = 'Guest'
 
-    return render_template("index.html", sensor_data=sensor_data, hello_username=hello_username, is_guest=is_guest)
+    return render_template("index.html", sensor_data=sensor_data, hello_username=hello_username, is_guest=is_guest, status=status)
 
 @app.route("/overview")
 def overview():

@@ -37,7 +37,7 @@
     {% endif %}
   </div>
   <div class="content">
-    <h3 class="heading">Hey, {{ hello_username }} 👋</h3>
+    <h3 class="heading">Hey, {{ hello_username }} 👋 Yur device is <span id="status" data-status="{{ status }}">{{ status }}</span></h3>
     <hr class="rounded">
     <div class="upGrid">
     
@@ -56,24 +56,41 @@
   </div>
 
   <script>
+    var status = document.getElementById("status").getAttribute("data-status");
+
     function updateData() {
-      fetch('/data')
-        .then(response => response.json())
-        .then(data => {
-          Object.keys(data).forEach(sensor => {
-            document.getElementById(`${sensor}Value`).innerText = data[sensor].value;
+      if (status !== "Offline") {
+        fetch('/data')
+          .then(response => {
+            if (response.ok) {
+              return response.json();
+            } else {
+              throw new Error('Ошибка при получении данных');
+            }
+          })
+          .then(data => {
+            Object.keys(data).forEach(sensor => {
+              document.getElementById(`${sensor}Value`).innerText = data[sensor].value;
+            });
+  
+            var canvas = document.getElementById("canvas");
+            chartify(canvas, data);
+  
+            var settings = {
+              "backgroundColor": "#333333", 
+              "chartColor": "#cdb3d5",
+              "chartLinesColor": "#fff",
+              "textColor": "#fff"
+            };
+          })
+          .catch(error => {
+            console.error(error);
           });
-        });
-        var canvas = document.getElementById("canvas");
-        chartify(canvas, data);
-        var settings = {
-          "backgroundColor": "#333333", 
-          "chartColor": "#cdb3d5",
-          "chartLinesColor": "#fff",
-          "textColor": "#fff"
-      };
+      }
     }
+    updateData();
     setInterval(updateData, 5500);
   </script>
+  
 </body>
 </html>
