@@ -17,7 +17,7 @@
   --blum:              #2F81F7;
   --blue:              #87ceeb;
 }
-/*
+
 :root.dark-theme {
   --main-bg-color:     #ffffff;
   --secondary-bg-color:#e6e6e6;
@@ -28,7 +28,7 @@
   --blum:              #2F81F7;
   --blue:              #87ceeb;
 }
-*/
+
 body {
   font-family: "Work Sans", sans-serif;
   margin: 0;
@@ -192,7 +192,7 @@ p {
   top: 10px; 
   left: 10px; 
   font-size: 24px;
-  color: #ff9800;
+  color: var(--blue);
 }
 @media (max-width: 768px) {
   .card {
@@ -209,7 +209,7 @@ p {
   transform: scale(0.95) rotateZ(1.7deg);
 }
 hr.rounded {
-  border-top: 1px solid #bbb;
+  border-top: 1px solid var(--gray);
   border-radius: 5px;
   margin-bottom: 2%;
 }

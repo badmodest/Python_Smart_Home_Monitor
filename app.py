@@ -94,21 +94,21 @@ mqtt_client.loop_start()
 
 ##################################
 
-@app.route('/editor')
-def editor():
-    return render_template('editor.html')
+# @app.route('/editor')
+# def editor():
+#     return render_template('editor.html')
 
-@app.route('/save_card', methods=['POST'])
-def save_card():
-    data = request.get_json()
-    card_name = data.get('name')
-    card_code = data.get('code')
+# @app.route('/save_card', methods=['POST'])
+# def save_card():
+#     data = request.get_json()
+#     card_name = data.get('name')
+#     card_code = data.get('code')
 
-    file_path = f'cards/{card_name.lower()}.yaml'
-    with open(file_path, 'w') as file:
-        file.write(card_code)
+#     file_path = f'cards/{card_name.lower()}.yaml'
+#     with open(file_path, 'w') as file:
+#         file.write(card_code)
 
-    return jsonify({'success': True, 'message': 'Карточка успешно сохранена'})
+#     return jsonify({'success': True, 'message': 'Карточка успешно сохранена'})
 
 ##################################
 
