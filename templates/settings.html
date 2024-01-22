@@ -44,14 +44,43 @@
                 <input type="text" name="mqtt_port" placeholder="1883" class="input" value="{{ mqtt_port }}">
                 <span class="label">MQTT Port</span>
             </div>
+        </div>
+
+        <div class="settingsElement">
+            <a class="title">Topic Settings</a>
+            {% for topic, details in topic_settings.items() %}
+                <div class="inputBox">
+                    <input type="text" name="topic_{{ topic }}_value" placeholder="Value" class="input" value="{{ details['value'] }}">
+                    <input type="text" name="topic_{{ topic }}_unit" placeholder="Unit" class="input" value="{{ details['unit'] }}">
+                    <input type="text" name="topic_{{ topic }}_icon" placeholder="Icon" class="input" value="{{ details['icon'] }}">
+                    <span class="label">{{ topic }}</span>
+                </div>
+            {% endfor %}
             <div>
-                <button onclick="switchTheme('dark-theme')">Switch Theme</button>
-            </div>    
-            <button type="submit" class="save" onclick="this.className='saved'"> </button>
+                <button type="button" onclick="addTopic()">Add Topic</button>
+            </div>
+        </div>
+
+        <div>
+            <button type="submit" class="save" onclick="this.className='saved'">Save</button>
         </div>
     </form>
-  </div>
-  <script>
+</div>
+
+<script>
+    function addTopic() {
+        const newTopic = prompt("Enter the new topic name:");
+        if (newTopic) {
+            const newDiv = document.createElement("div");
+            newDiv.className = "inputBox";
+            newDiv.innerHTML = `
+                <input type="text" name="topic_${newTopic}_value" placeholder="Value" class="input">
+                <input type="text" name="topic_${newTopic}_unit" placeholder="Unit" class="input">
+                <input type="text" name="topic_${newTopic}_icon" placeholder="Icon" class="input">
+                <span class="label">${newTopic}</span>`;
+            document.querySelector('.settingsElement').appendChild(newDiv);
+        }
+    }
     function switchTheme(theme) {
         fetch(`/switch-theme/${theme}`)
           .then(response => response.json())

@@ -198,6 +198,24 @@ def charts():
         return redirect(url_for('login'))
     return render_template("charts.html", sensor_data=sensor_data)
 
+def read_settings():
+    settings = {'mqtt_broker': '127.0.0.1', 'mqtt_port': '1883'}
+    try:
+        with open('settings.csv', mode='r') as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                settings[row[0]] = row[1]
+    except FileNotFoundError:
+        pass 
+
+    return settings
+
+def save_settings(settings):
+    with open('settings.csv', mode='w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        for key, value in settings.items():
+            writer.writerow([key, value])
+
 @app.route("/settings", methods=['GET', 'POST'])
 def settings_route():
     if not session.get('logged_in'):
@@ -207,15 +225,35 @@ def settings_route():
         mqtt_broker = request.form['mqtt_broker']
         mqtt_port = request.form['mqtt_port']
 
-        with open('settings.csv', mode='w', newline='') as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerow(['mqtt_broker', mqtt_broker])
-            writer.writerow(['mqtt_port', mqtt_port])
+        settings = read_settings()
+        settings['mqtt_broker'] = mqtt_broker
+        settings['mqtt_port'] = mqtt_port
+        save_settings(settings)
 
         return redirect(url_for('index'))
     else:
-        settings = read_settings()
-        return render_template("settings.html", mqtt_broker=settings['mqtt_broker'], mqtt_port=settings['mqtt_port'])
+        mqtt_settings = read_settings()
+        topic_settings = read_topic_settings()
+        return render_template("settings.html", mqtt_broker=mqtt_settings['mqtt_broker'],
+                               mqtt_port=mqtt_settings['mqtt_port'], topic_settings=topic_settings)
+
+def read_topic_settings():
+    topic_settings = {}
+    try:
+        with open('topic_settings.csv', mode='r') as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                topic_settings[row[0]] = {'value': float(row[1]), 'unit': row[2], 'icon': row[3]}
+    except FileNotFoundError:
+        pass  
+
+    return topic_settings
+
+def save_topic_settings(topic_settings):
+    with open('topic_settings.csv', mode='w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        for key, value in topic_settings.items():
+            writer.writerow([key, value['value'], value['unit'], value['icon']])
 
 
 @app.route("/data")
