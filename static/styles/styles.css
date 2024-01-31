@@ -17,7 +17,14 @@
   --blum:              #2F81F7;
   --blue:              #87ceeb;
 }
+:realtime {
 
+--text: #efebf8;
+--background: #0c0715;
+--primary: #ab92db;
+--secondary: #762749;
+--accent: #c14f46;
+}
 :root.dark-theme {
   --main-bg-color:     #ffffff;
   --secondary-bg-color:#e6e6e6;

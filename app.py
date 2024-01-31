@@ -67,7 +67,7 @@ mqtt_client.loop_start()
 # def update_sensor_values():
 #     while True:
 #         for sensor in sensor_data:
-#             if sensor.startswith("sensor"):
+#             if sensor.st artswith("sensor"):
 #                 sensor_data[sensor]["value"] = round(random.uniform(0, 100), 2)
 #             elif sensor == "Temp":
 #                 sensor_data[sensor]["value"] = round(random.uniform(15, 30), 2)
