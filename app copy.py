@@ -8,19 +8,18 @@ import sys
 import csv
 from random import randint
 import time
+from logging import Logger
+
+# Настройка логирования
+logger = Logger(__name__)
 
 def read_settings():
     try:
-        with open('settings.csv', mode='r', newline='') as csvfile:
-            reader = csv.reader(csvfile)
-            settings = {rows[0]: rows[1] for rows in reader}
-            return settings
+        with open('settings.yaml', 'r') as f:
+            settings = load(f)
     except FileNotFoundError:
-        with open('settings.csv', mode='w', newline='') as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerow(['mqtt_broker', '127.0.0.1'])
-            writer.writerow(['mqtt_port', '1883'])
-        return {'mqtt_broker': '127.0.0.1', 'mqtt_port': '1883'}
+        settings = {'mqtt_broker': '127.0.0.1', 'mqtt_port': '1883'}
+    return settings
 
 
 settings = read_settings()
@@ -44,6 +43,7 @@ sensor_data = {
     "battery": {"value": 69, "unit": "%", "icon": "battery_25"},
 }
 
+
 def on_message(client, userdata, msg):
     global last_update_time
     try:
@@ -51,7 +51,7 @@ def on_message(client, userdata, msg):
         sensor_data[sensor_name]["value"] = float(msg.payload.decode("utf-8"))
         last_update_time = datetime.now()
     except Exception as e:
-        print(f"Error processing MQTT message: {e}")
+        logger.error(f"Error processing MQTT message: {e}")
 
 
 mqtt_client = mqtt.Client()

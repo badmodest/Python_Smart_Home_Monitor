@@ -225,6 +225,26 @@ color: var(--white)
 
 }
 
+.card {
+  background-color: #202225;        /* Darker background */
+  border-radius: 15px;             /* Gentle border curve */
+  box-shadow: 0 5px 10px rgba(0,0,0,0.2);       /* Subtle shadow */
+  padding: 20px;
+  margin: 20px;
+  transition: all 0.3s ease;      /* Smooth hover transition */
+}
+
+.card:hover {
+  transform: translateY(-5px);       /* Slight lift on hover */
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3); /* Stronger shadow */
+}
+
+h3 {
+  color: #f0f0f5;                /* Lighter heading color */
+  font-weight: 600;              /* Bolder heading weight */
+  margin-bottom: 15px;
+}
+
 .input,button {
   font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","Roboto","Oxygen","Ubuntu","Cantarell","Fira Sans","Droid Sans","Helvetica Neue",sans-serif;
   font-weight: 500;

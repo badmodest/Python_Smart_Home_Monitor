@@ -13,6 +13,7 @@
   
 </head>
 <body>
+  <div id="notification"></div>
   <div class="bottom-menu">
     <a href="#" class="menu-item"><i class="fas fa-home fa-2x"></i></a>
     <a href="/overview" class="menu-item"><i class="fas fa-chart-bar fa-2x"></i></a>
@@ -91,6 +92,53 @@
     updateData();
     setInterval(updateData, 5500);
   </script>
-  
+  <script>
+    // Проверка поддержки уведомлений
+    if (!("Notification" in window))
+        alert("Ваш браузер не поддерживает уведомления.");
+    else if (Notification.permission !== "granted") {
+        // Запрос разрешения на уведомления
+        Notification.requestPermission().then(function(permission) {
+            if (permission === "granted") {
+                // Запуск интервала для обновления значения каждые 10 секунд
+                setInterval(function() {
+                    updateIValue();
+                }, 10000);
+            }
+        });
+    } else {
+        // Если разрешение уже есть, запустите интервал
+        setInterval(function() {
+            updateIValue();
+        }, 10000);
+    }
+
+    // Начальное значение переменной I
+    var i_value = 25;
+
+    function updateIValue() {
+        // Обновление значения переменной I
+        i_value += 10;
+
+        // Условие для отправки уведомления
+        if (i_value > 30) {
+            notifyMe();
+        }
+    }
+
+    function notifyMe() {
+        // Создание уведомления
+        var notification = new Notification("Все еще работаешь?", {
+            tag: "ache-mail",
+            body: "Пора сделать паузу и отдохнуть",
+            icon: "https://itproger.com/img/notify.png"
+        });
+
+        // Обработка клика по уведомлению
+        notification.onclick = function() {
+            console.log("Уведомление было кликнуто.");
+        };
+    }
+</script>
 </body>
 </html>
