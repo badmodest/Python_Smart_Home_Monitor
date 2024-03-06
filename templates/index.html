@@ -45,11 +45,26 @@
     
     </div>
     <div class="grid">
+      <div class="big-card">
+        <h2>AHSGFAJ</h2>
+        <p id="date-time"></p>
+      </div>
+    </div>
+    
+     <!-- <div class="big-card">
+        <h2>Погода</h2>
+        <img id="weather-icon" src="weather-icon.png" alt="Иконка погоды">
+        <p id="weather-description"></p>
+        <p id="temperature"></p>
+    </div>
+     -->
+    <div class="grid">
+
       {% for sensor, data in sensor_data.items() %}
         <div class="card">
           <i class="f7-icons icon-in-card">{{ data.icon }}</i>
-          <h3>{{ sensor }}</h3>
-          <p>Value: <span id="{{ sensor }}Value">{{ data.value }}</span> {{ data.unit }}</p>
+          <h3 class="text">{{ sensor }}</h3>
+          <p class="text">Value: <span id="{{ sensor }}Value">{{ data.value }}</span> {{ data.unit }}</p>
         </div>
       {% endfor %}
     </div>
@@ -93,6 +108,53 @@
     setInterval(updateData, 5500);
   </script>
   <script>
+    function updateDateTime() {
+      const dateTimeElement = document.getElementById("date-time");
+      const now = new Date();
+      const options = {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+      };
+      dateTimeElement.textContent = now.toLocaleDateString("en-US", options);
+    }
+
+
+    updateDateTime();
+
+    setInterval(updateDateTime, 1000);
+
+      
+    async function getWeather() {
+     // const weatherAPIKey = 2b7f609a11610104bafd800647e21720;
+      const city = Dnipro; 
+
+      const response = await fetch(
+       // `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${weatherAPIKey}&units=metric`
+      );
+      const data = await response.json();
+
+      const weatherIconElement = document.getElementById("weather-icon");
+      const weatherDescriptionElement = document.getElementById("weather-description");
+      const temperatureElement = document.getElementById("temperature");
+
+      weatherIconElement.src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
+      weatherDescriptionElement.textContent = data.weather[0].description;
+      temperatureElement.textContent = `${data.main.temp}°C`;
+    }
+
+ 
+    getWeather();
+
+
+
+
+
+
+
+
     // Проверка поддержки уведомлений
     if (!("Notification" in window))
         alert("Ваш браузер не поддерживает уведомления.");

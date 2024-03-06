@@ -1,21 +1,29 @@
 @import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;500&display=swap');
 .fa-home { padding-right: 10px;}
 .fa-chart-bar { padding-right: 10px;}
-.fa-tachometer-alt { color: white; padding-right: 10px;}
-.fa-sign-out-alt { color: white; padding-right: 10px;}
+.fa-tachometer-alt {  padding-right: 10px;}
+.fa-sign-out-alt {  padding-right: 10px;}
 .fa-sign-in-alt {padding-right: 10px;}
 .fa-gear { padding-right: 10px;}
 
 
 :root {
-  --main-bg-color:     #333333;
-  --secondary-bg-color:#181818;
+  --main-bg-color:     #e5e6e1;
+  --secondary-bg-color:#ffffff;
   --tertiary-bg-color: #505050;
-  --white:             #ffffff;
+  --white:             #353635;
   --gray:              #c0c0c0;
-  --black:             #000000;
-  --blum:              #2F81F7;
-  --blue:              #87ceeb;
+  --black:             #e5e5e5;
+  --blum:              #bbb3cb;
+  --blue:              #2F81F7;
+  --lavander:          #bbb3cb;
+  --d_lavander:        #463b63;
+  --pinky:             #cb9ca4;
+  --d_pinky:           #5e2327;
+  --cyan:              #9dcbc9;
+  --d_cyan:            #146964;
+  --yellow:            #e4b975;
+  --d_yellow:          #66461d;
 }
 :realtime {
 
@@ -178,15 +186,35 @@ p {
   justify-items: center;
 
 }
+.text {
+ color: var(--d_yellow)
 
+
+}
+
+.big-card {
+  padding: 2%;
+  border-radius: 20px;
+  box-sizing: border-box;
+  width: 290px;
+  height: 254px;
+  background: var(--yellow);
+  border: 1px solid var(--yellow);
+  box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(6px);
+  cursor: pointer;
+  transition: all 0.5s;
+  user-select: none;
+  color: var(--black);
+}
 .card {
   padding: 2%;
   border-radius: 20px;
   box-sizing: border-box;
   width: 190px;
   height: 254px;
-  background: var(--main-bg-color);
-  border: 1px solid var(--gray);
+  background: var(--yellow);
+  border: 1px solid var(--yellow);
   box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(6px);
   cursor: pointer;
@@ -199,7 +227,7 @@ p {
   top: 10px; 
   left: 10px; 
   font-size: 24px;
-  color: var(--blue);
+  color: var(--d_yellow);
 }
 @media (max-width: 768px) {
   .card {
@@ -207,9 +235,13 @@ p {
   }
 }
 .card:hover {
-  border: 1px solid var(--blue);
-  transform: scale(1.1);
+  border: 1px solid var(--d_yellow);
+  transform: scale(0.95);
   z-index: 10;
+  -webkit-transform: scale(0.95);
+  -moz-transform: scale(0.95);
+  -ms-transform: scale(0.95);
+  -o-transform: scale(0.95);
 }
 
 .card:active {
@@ -225,25 +257,7 @@ color: var(--white)
 
 }
 
-.card {
-  background-color: #202225;        /* Darker background */
-  border-radius: 15px;             /* Gentle border curve */
-  box-shadow: 0 5px 10px rgba(0,0,0,0.2);       /* Subtle shadow */
-  padding: 20px;
-  margin: 20px;
-  transition: all 0.3s ease;      /* Smooth hover transition */
-}
 
-.card:hover {
-  transform: translateY(-5px);       /* Slight lift on hover */
-  box-shadow: 0 10px 20px rgba(0,0,0,0.3); /* Stronger shadow */
-}
-
-h3 {
-  color: #f0f0f5;                /* Lighter heading color */
-  font-weight: 600;              /* Bolder heading weight */
-  margin-bottom: 15px;
-}
 
 .input,button {
   font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","Roboto","Oxygen","Ubuntu","Cantarell","Fira Sans","Droid Sans","Helvetica Neue",sans-serif;
@@ -251,7 +265,7 @@ h3 {
   font-size: 14px;
   margin: 12px 10px 20px 0px;
   color: var(--white);
-  background-color: rgb(28,28,30);
+  background-color: var(--main-bg-color);
   box-shadow: 0 0 .4vw rgba(0,0,0,0.5), 0 0 0 .15vw transparent;
   border-radius: 0.4vw;
   border: none;
