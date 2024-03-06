@@ -259,15 +259,13 @@ grid-column-start: 1;
   width: 9rem;
   height: 10rem;
   background-color: var(--black);
-  border-radius: 15px;
+  border-radius: 10px;
   position: relative;
   cursor: pointer;
   outline: none;
   transition: all 0.2s ease-in-out;
-  -webkit-transition: all 0.2s ease-in-out;
-  -moz-transition: all 0.2s ease-in-out;
-  -ms-transition: all 0.2s ease-in-out;
-  -o-transition: all 0.2s ease-in-out;
+  margin-right: 3px;
+
 }
 
 
@@ -407,6 +405,123 @@ color: var(--white)
 .saved:before {
   content: 'Saved!';
 }
+
+
+#popup {
+  position: fixed;
+  top: 10%;
+  left: 10%;
+  width: 80%;
+  height: 80%;
+  background-color: #fff;
+  border-radius: 10px;
+  z-index: 100;
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0.5s, opacity 0.5s ease-in-out;
+}
+
+#popup.visible {
+  visibility: visible;
+  opacity: 1;
+  box-shadow: 10px 10px 10px 10px #1f1f1f;
+}
+
+.popup-content {
+  padding: 20px;
+}
+
+.popup-title {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+#canvas {
+  border: 1px solid #ccc;
+}
+
+.popup-text {
+  margin-top: 10px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* 
 @media screen and (max-width: 767px) {
   .grid {

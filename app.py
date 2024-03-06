@@ -43,8 +43,13 @@ sensor_data = {
     "Battery": {"value": 4.4, "unit": "V", "icon": "bolt_horizontal_fill"},
     "battery": {"value": 69, "unit": "%", "icon": "battery_25"},
 }
-
+data = []
 def on_message(client, userdata, msg):
+    global data
+    data.append({
+    "timestamp": datetime.now(),
+    "value": float(msg.payload.decode("utf-8")),
+    })
     global last_update_time
     try:
         sensor_name = msg.topic.split("/")[-1]
