@@ -11,12 +11,12 @@ import time
 
 def read_settings():
     try:
-        with open('settings.csv', mode='r', newline='') as csvfile:
+        with open('data/settings.csv', mode='r', newline='') as csvfile:
             reader = csv.reader(csvfile)
             settings = {rows[0]: rows[1] for rows in reader}
             return settings
     except FileNotFoundError:
-        with open('settings.csv', mode='w', newline='') as csvfile:
+        with open('data/settings.csv', mode='w', newline='') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(['mqtt_broker', '127.0.0.1'])
             writer.writerow(['mqtt_port', '1883'])
@@ -27,7 +27,7 @@ settings = read_settings()
 
 app = Flask(__name__)
 app.secret_key = 'development key'
-passwords_file = 'passwd'
+passwords_file = 'data\passwd'
 
 mqtt_broker = settings['mqtt_broker']
 mqtt_port = int(settings['mqtt_port'])
@@ -206,7 +206,7 @@ def charts():
 def read_settings():
     settings = {'mqtt_broker': '127.0.0.1', 'mqtt_port': '1883'}
     try:
-        with open('settings.csv', mode='r') as csvfile:
+        with open('data/settings.csv', mode='r') as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
                 settings[row[0]] = row[1]
@@ -216,7 +216,7 @@ def read_settings():
     return settings
 
 def save_settings(settings):
-    with open('settings.csv', mode='w', newline='') as csvfile:
+    with open('data/settings.csv', mode='w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         for key, value in settings.items():
             writer.writerow([key, value])
@@ -245,7 +245,7 @@ def settings_route():
 def read_topic_settings():
     topic_settings = {}
     try:
-        with open('topic_settings.csv', mode='r') as csvfile:
+        with open('topic_data/settings.csv', mode='r') as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
                 topic_settings[row[0]] = {'value': float(row[1]), 'unit': row[2], 'icon': row[3]}
@@ -255,7 +255,7 @@ def read_topic_settings():
     return topic_settings
 
 def save_topic_settings(topic_settings):
-    with open('topic_settings.csv', mode='w', newline='') as csvfile:
+    with open('topic_data/settings.csv', mode='w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         for key, value in topic_settings.items():
             writer.writerow([key, value['value'], value['unit'], value['icon']])
