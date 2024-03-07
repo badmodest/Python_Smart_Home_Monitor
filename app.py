@@ -11,12 +11,12 @@ import time
 
 def read_settings():
     try:
-        with open('data/settings.csv', mode='r', newline='') as csvfile:
+        with open('static/data/settings.csv', mode='r', newline='') as csvfile:
             reader = csv.reader(csvfile)
             settings = {rows[0]: rows[1] for rows in reader}
             return settings
     except FileNotFoundError:
-        with open('data/settings.csv', mode='w', newline='') as csvfile:
+        with open('static/data/settings.csv', mode='w', newline='') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(['mqtt_broker', '127.0.0.1'])
             writer.writerow(['mqtt_port', '1883'])
@@ -44,17 +44,31 @@ sensor_data = {
     "battery": {"value": 69, "unit": "%", "icon": "battery_25"},
 }
 data = []
+
 def on_message(client, userdata, msg):
     global data
-    data.append({
-    "timestamp": datetime.now(),
-    "value": float(msg.payload.decode("utf-8")),
-    })
     global last_update_time
+
     try:
         sensor_name = msg.topic.split("/")[-1]
-        sensor_data[sensor_name]["value"] = float(msg.payload.decode("utf-8"))
+        sensor_value = float(msg.payload.decode("utf-8"))
+
+        # Добавляем данные в список
+        data.append({
+            "timestamp": datetime.now(),
+            "sensor_name": sensor_name,
+            "value": sensor_value
+        })
+
+        # Записываем данные в CSV файл
+        with open("static/data/dataa.csv", "w", newline="") as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(["timestamp", "sensor_name", "value"])
+            for data_point in data:
+                writer.writerow([data_point["timestamp"], data_point["sensor_name"], data_point["value"]])
+
         last_update_time = datetime.now()
+
     except Exception as e:
         print(f"Error processing MQTT message: {e}")
 

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='/favicon.ico') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/styles.css') }}">
+  <link rel="data" href="{{ url_for('static', filename='data/dataa.csv') }}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/framework7-icons/css/framework7-icons.css">
   <script src="https://kit.fontawesome.com/7e84202197.js" crossorigin="anonymous"></script>
@@ -95,26 +96,34 @@ window.addEventListener("click", (event) => {
   }
 });
 
-// Получить доступ к списку данных из Python
-const data = window.data;
+fetch("/static/data/dataa.csv")
+  .then(response => {
+    if (!response.ok) {
+      throw new Error("Ошибка загрузки файла: " + response.status);
+    }
+    return response.text();
+  })
+  .then(text => {
+    const data = Papa.parse(text, { header: true }).data;
+    console.log(data);
+  })
+  .catch(error => {
+    console.error(error);
+  });
 
 function updateGraph() {
   if (data.length === 0) {
-    return; // Данные отсутствуют, ничего не делаем
+    return; 
   }
   
-  // Получить последние данные
   const latestData = data[data.length - 1];
 }
 
-// Функция для отображения модального окна
 function showModal(card) {
-  // ... (получить ID карточки)
   const cardId = card.getAttribute("id");
 
   const cardData = data.filter(d => d.cardId === cardId);
 
-  // Очистить canvas
   const canvas = document.getElementById("canvas");
   const ctx = canvas.getContext("2d");
   ctx.clearRect(0, 0, canvas.width, canvas.height);

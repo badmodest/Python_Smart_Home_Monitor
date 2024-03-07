@@ -264,6 +264,7 @@ grid-column-start: 1;
   cursor: pointer;
   outline: none;
   transition: all 0.2s ease-in-out;
+  box-shadow: inset -35px 0 0 0 rgba(0, 0, 0, 0.2);
   margin-right: 3px;
 
 }
@@ -271,6 +272,7 @@ grid-column-start: 1;
 
 .switch:checked {
   background-color: var(--green);
+  box-shadow: inset 35px 0 0 0 rgba(0, 0, 0, 0.2);
 }
 
 .date-time-container {
