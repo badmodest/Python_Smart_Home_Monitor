@@ -10,6 +10,8 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/framework7-icons/css/framework7-icons.css">
   <script src="https://kit.fontawesome.com/7e84202197.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.1/papaparse.min.js"></script>
+
   <title>Smart Home Monitor</title>
   
 </head>
@@ -41,8 +43,7 @@
   <div class="content">
     <h3 class="heading">Hey, {{ hello_username }} 👋 Yur device is <span id="status" data-status="{{ status }}">{{ status }}</span></h3>
     <hr class="rounded">
-    <div class="upGrid">
-    </div>
+    
     <div class="grid-container">
       <div class="big-card">
         <div class="date-time-container">
@@ -73,13 +74,12 @@
         </div>
     </div>
     </div>
+
+
+
     </div>
-    <div id="modal" class="hidden">
-      <div class="modal-content">
-        <h2 class="modal-title">График значений</h2>
-        <canvas id="canvas" width="400" height="200"></canvas>
-      </div>
-    </div>
+  </div>
+
   <script>
     const card = document.querySelector(".card");
 const popup = document.getElementById("popup");
@@ -96,79 +96,7 @@ window.addEventListener("click", (event) => {
   }
 });
 
-fetch("/static/data/dataa.csv")
-  .then(response => {
-    if (!response.ok) {
-      throw new Error("Ошибка загрузки файла: " + response.status);
-    }
-    return response.text();
-  })
-  .then(text => {
-    const data = Papa.parse(text, { header: true }).data;
-    console.log(data);
-  })
-  .catch(error => {
-    console.error(error);
-  });
 
-function updateGraph() {
-  if (data.length === 0) {
-    return; 
-  }
-  
-  const latestData = data[data.length - 1];
-}
-
-function showModal(card) {
-  const cardId = card.getAttribute("id");
-
-  const cardData = data.filter(d => d.cardId === cardId);
-
-  const canvas = document.getElementById("canvas");
-  const ctx = canvas.getContext("2d");
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  const labels = cardData.map(d => d.timestamp);
-  const values = cardData.map(d => d.value);
-
-  const myChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'Значение',
-        data: values,
-        borderColor: 'blue',
-        backgroundColor: 'rgba(0, 0, 255, 0.2)',
-      }]
-    },
-    options: {
-      scales: {
-        yAxes: [{
-          ticks: {
-            beginAtZero: true
-          }
-        }]
-      }
-    }
-  });
-
-  // Отобразить модальное окно
-  document.getElementById("modal").classList.remove("hidden");
-}
-
-// Функция для закрытия модального окна
-function closeModal() {
-  document.getElementById("modal").classList.add("hidden");
-}
-
-// Обработчик нажатия на карточку
-function onCardClick(card) {
-  showModal(card);
-}
-
-// Запуск обновления графика
-setInterval(updateGraph, 1000);
 
 
 
@@ -180,11 +108,11 @@ setInterval(updateGraph, 1000);
       if (checkbox.checked) {
         console.log("Включена темная тема");
         document.body.classList.add("dark-theme");
-        // Добавьте код для активации темной темы
+        // 
       } else {
         console.log("Включена светлая тема");
         document.body.classList.remove("dark-theme");
-        // Добавьте код для активации светлой темы
+        // 
       }
     });
 
@@ -253,7 +181,7 @@ setInterval(updateGraph, 1000);
     updateData();
     setInterval(updateData, 5500);
 
-
+    
 </script>
 </body>
 </html>

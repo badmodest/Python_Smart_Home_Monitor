@@ -27,7 +27,8 @@ settings = read_settings()
 
 app = Flask(__name__)
 app.secret_key = 'development key'
-passwords_file = 'data\passwd'
+passwords_file = 'static\\data\\passwd'
+
 
 mqtt_broker = settings['mqtt_broker']
 mqtt_port = int(settings['mqtt_port'])
@@ -40,6 +41,7 @@ sensor_data = {
     "Value": {"value": 50, "unit": "%", "icon": "chart_bar_fill"},
     "Pressure": {"value": 1015, "unit": "hPa", "icon": "tornado"},
     "sensor1": {"value": 0, "unit": "NaN", "icon": "burn"},
+    "sensor3": {"value": 31, "unit": "Danon", "icon": "burn"},
     "Battery": {"value": 4.4, "unit": "V", "icon": "bolt_horizontal_fill"},
     "battery": {"value": 69, "unit": "%", "icon": "battery_25"},
 }
@@ -280,6 +282,7 @@ def get_data():
     return json.dumps(sensor_data)
 
 @app.errorhandler(404)
+@app.errorhandler(500)
 def page_not_found(e):
     return render_template('404.html'), 404
 
@@ -311,3 +314,63 @@ if __name__ == '__main__':
         log = logging.getLogger('werkzeug')
         log.setLevel(logging.ERROR)
         app.run(host=ip_address, port=port, use_reloader=False)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                    
