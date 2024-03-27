@@ -3,7 +3,7 @@
 <br />
 <div>
     <div align="center">
-        <img src="./favicon.ico" alt="Logo" width="100" height="100">
+        <img src="./static/favicon.ico" alt="Logo" width="100" height="100">
     </div>
 
 ### Smart Home Monitor
