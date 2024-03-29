@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
+from flask_caching import Cache
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 import yaml
@@ -8,7 +9,6 @@ import sys
 import csv
 from random import randint
 import time
-
 def read_settings():
     try:
         with open('static/data/settings.csv', mode='r', newline='') as csvfile:
@@ -26,6 +26,7 @@ def read_settings():
 settings = read_settings()
 
 app = Flask(__name__)
+cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 app.secret_key = 'development key'
 passwords_file = 'static\\data\\passwd'
 
@@ -47,7 +48,11 @@ sensor_data = {
 }
 data = []
 
-def on_message(client, userdata, msg):
+def on_message(client, userdata, msg , rc):
+    if rc == 0:
+        print("Connected to MQTT broker!")
+    else:
+        print("Connection failed with code:", rc) 
     global data
     global last_update_time
 
@@ -75,7 +80,7 @@ def on_message(client, userdata, msg):
         print(f"Error processing MQTT message: {e}")
 
 
-mqtt_client = mqtt.Client()
+mqtt_client = mqtt.Client(client_id="", protocol=mqtt.MQTTv5)
 mqtt_client.on_message = on_message
 mqtt_client.connect(mqtt_broker, mqtt_port, 60)
 
@@ -187,6 +192,7 @@ def logout():
     return redirect(url_for('login'))
 
 @app.route("/")
+@cache.cached(timeout=60)
 def index():
     global status, last_update_time
 

@@ -1,2 +1,4 @@
 Flask==2.0.1
 paho-mqtt==1.5.1
+flask_caching==2.1.0
+werkzeug==3.0.1

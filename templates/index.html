@@ -44,7 +44,7 @@
     <h3 class="heading">Hey, {{ hello_username }} 👋 Yur device is <span id="status" data-status="{{ status }}">{{ status }}</span></h3>
     <hr class="rounded">
     
-    <div class="grid-container">
+    <div class="grid-container"  id="agg">
       <div class="big-card">
         <div class="date-time-container">
           <p class="day">There</p>
@@ -181,7 +181,18 @@ window.addEventListener("click", (event) => {
     updateData();
     setInterval(updateData, 5500);
 
+    function refreshSortable() {
+      const dragAndDropItems = document.getElementById('card');
+      if (dragAndDropItems.sortable) {
+        dragAndDropItems.sortable.destroy(); // Уничтожаем старую инициализацию Sortable.js
+      }
     
+      new Sortable(dragAndDropItems, {
+        animation: 350,
+        chosenClass: 'team-member-chosen',
+        dragClass: 'team-member-drag'
+      });
+    }
 </script>
 </body>
 </html>
