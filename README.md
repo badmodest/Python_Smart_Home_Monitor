@@ -61,15 +61,9 @@ Smart Home Monitor is a web application that allows you to monitor and visualize
     ```
 5. Access the application in your web browser by default at [http://127.0.0.1:5000/](http://127.0.0.1:5000/)
 
-## Usage
 
-- Visit the home page to view real-time sensor data and charts.
-- Click on a specific sensor card to view a detailed chart for that sensor.
   
-
-## Contributing
-
-Feel free to contribute to the project by opening issues or submitting pull requests.
+TODO: [TODO.md](./TODO.md)
 
 ## License
 
