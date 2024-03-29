@@ -8,7 +8,13 @@ import json
 import sys
 import csv
 from random import randint
+import argparse
 import time
+import logging
+import tkinter as tk
+from tkinter import messagebox
+
+
 def read_settings():
     try:
         with open('static/data/settings.csv', mode='r', newline='') as csvfile:
@@ -22,22 +28,43 @@ def read_settings():
             writer.writerow(['mqtt_port', '1883'])
         return {'mqtt_broker': '127.0.0.1', 'mqtt_port': '1883'}
 
+def run_flask_app(ip, port, log_field):
+    # Создать обработчик логов
+    log_handler = TextLogHandler(log_field)
 
-settings = read_settings()
+    # Получить логгер app.py
+    logger = logging.getLogger(__name__) 
+
+    # Добавить обработчик логов
+    logger.addHandler(log_handler)
+
+    logger.info("Starting app")
+
+    app.run(host=ip, port=port)
+
+class TextLogHandler(logging.Handler):
+    def __init__(self, text_field):
+        super().__init__()
+        if not isinstance(text_field, tk.Text):
+            raise ValueError("text_field must be a tkinter Text object")
+        self.text_field = text_field
+
+    def emit(self, record):
+        log_entry = f"{record.levelname}: {record.message}" 
+        self.text_field.insert("end", log_entry + "\n")
+        self.text_field.see("end")  # Прокрутка до конца
 
 app = Flask(__name__)
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 app.secret_key = 'development key'
 passwords_file = 'static\\data\\passwd'
-
-
+settings = read_settings()
 mqtt_broker = settings['mqtt_broker']
 mqtt_port = int(settings['mqtt_port'])
 hello_username = ""
 status = "Offline"
 last_update_time = datetime.now()
 sensor_data = {
-
     "Temp": {"value": 25, "unit": "°C", "icon": "sun_max"},
     "Value": {"value": 50, "unit": "%", "icon": "chart_bar_fill"},
     "Pressure": {"value": 1015, "unit": "hPa", "icon": "tornado"},
@@ -47,6 +74,7 @@ sensor_data = {
     "battery": {"value": 69, "unit": "%", "icon": "battery_25"},
 }
 data = []
+
 
 def on_message(client, userdata, msg , rc):
     if rc == 0:
@@ -301,82 +329,28 @@ def get_notification():
     else:
         return jsonify({'message': ''})
 
+
 if __name__ == '__main__':
-    ip_address = '192.168.31.94'        #Set Default to your own IP instead of localhost
-    port = 80                           #Set Default to the desired port instead of the default port
-    silent = False                      #Set True if no logging is required by default
-    for i in range(1, len(sys.argv), 2):
-        if sys.argv[i] == '--ip':
-            ip_address = sys.argv[i + 1]
-        elif sys.argv[i] == '--port':
-            port = int(sys.argv[i + 1])
-        elif sys.argv[i] == '--silent':
-            silent = True
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--ip", help="IP address", default="192.168.31.94")
+    parser.add_argument("--port", help="Port number", type=int, default=80)
+    parser.add_argument("--silent", help="Suppress logging", action="store_true")
 
-    if not silent:
-        app.run(host=ip_address, port=port)
+    args = parser.parse_args()
+
+    # Настройка логгера для Flask
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.INFO)  # Или logging.DEBUG
+    logger.info("Starting app")
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    file_handler = logging.FileHandler('flask.log')
+    file_handler.setLevel(logging.INFO)
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+
+
+    if not args.silent:
+        app.logger.setLevel(logging.INFO) 
+        app.run(host=args.ip, port=args.port)
     else:
-        import logging
-        log = logging.getLogger('werkzeug')
-        log.setLevel(logging.ERROR)
-        app.run(host=ip_address, port=port, use_reloader=False)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                                                                    
+        app.run(host=args.ip, port=args.port, use_reloader=False)
