@@ -1,6 +1,7 @@
 import subprocess
 import tkinter as tk
 from tkinter.scrolledtext import ScrolledText
+from tkinter import messagebox
 import logging
 import threading
 import webbrowser
@@ -12,8 +13,11 @@ class TextLogHandler(logging.Handler):
 
     def emit(self, record):
         log_entry = self.format(record)
-        self.text_widget.insert(tk.END, log_entry + "\n")
+        formatted_log_entry = format_log_entry(record)  # Форматирование текста
+        self.text_widget.insert(tk.END, formatted_log_entry + "\n")
         self.text_widget.see(tk.END)
+
+server_started = False
 
 def start_flask_server(ip_address, port):
     global app_process
@@ -45,7 +49,8 @@ def start_app():
         return
 
     threading.Thread(target=start_flask_server, args=(ip_address, port), daemon=True).start()
-
+    server_started = True
+    
 def format_log_entry(record):
     log_entry = f"{record.levelname}: {record.msg}"
     if record.levelname == "ERROR":
@@ -59,9 +64,18 @@ def format_log_entry(record):
         return f"<font color='red'>{log_entry}</font>"
     return log_entry
 
+def on_closing():
+    if messagebox.askokcancel("Quit", "Do you want to quit?"):
+        if server_started:
+            stop_flask_server()
+            root.destroy()
+        elif not server_started:
+            root.destroy()
+
 if __name__ == "__main__":
     root = tk.Tk()
     root.title("Flask Server")
+    root.protocol("WM_DELETE_WINDOW", on_closing)
 
     ip_label = tk.Label(text="IP-адрес:")
     ip_entry = tk.Entry()
@@ -89,8 +103,7 @@ if __name__ == "__main__":
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.INFO)
     handler = TextLogHandler(text_widget)
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s: %(message)s')
-    handler.setFormatter(formatter)
+    handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s: %(message)s'))  # Установка форматтера
     logger.addHandler(handler)
 
     root.mainloop()
