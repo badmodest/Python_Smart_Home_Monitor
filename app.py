@@ -60,14 +60,14 @@ def on_message(client, userdata, msg , rc):
         sensor_name = msg.topic.split("/")[-1]
         sensor_value = float(msg.payload.decode("utf-8"))
 
-        # Добавляем данные в список
+        # + данные в список
         data.append({
             "timestamp": datetime.now(),
             "sensor_name": sensor_name,
             "value": sensor_value
         })
 
-        # Записываем данные в CSV файл
+        # Записc в CSV 
         with open("static/data/dataa.csv", "w", newline="") as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(["timestamp", "sensor_name", "value"])
