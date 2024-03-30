@@ -29,13 +29,13 @@ def read_settings():
         return {'mqtt_broker': '127.0.0.1', 'mqtt_port': '1883'}
 
 def run_flask_app(ip, port, log_field):
-    # Создать обработчик логов
+    
     log_handler = TextLogHandler(log_field)
 
-    # Получить логгер app.py
+    
     logger = logging.getLogger(__name__) 
 
-    # Добавить обработчик логов
+   
     logger.addHandler(log_handler)
 
     logger.info("Starting app")
@@ -52,7 +52,7 @@ class TextLogHandler(logging.Handler):
     def emit(self, record):
         log_entry = f"{record.levelname}: {record.message}" 
         self.text_field.insert("end", log_entry + "\n")
-        self.text_field.see("end")  # Прокрутка до конца
+        self.text_field.see("end")  
 
 app = Flask(__name__)
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
@@ -338,9 +338,8 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    # Настройка логгера для Flask
     logger = logging.getLogger(__name__)
-    logger.setLevel(logging.INFO)  # Или logging.DEBUG
+    logger.setLevel(logging.INFO)
     logger.info("Starting app")
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
     file_handler = logging.FileHandler('flask.log')

@@ -184,7 +184,7 @@ window.addEventListener("click", (event) => {
     function refreshSortable() {
       const dragAndDropItems = document.getElementById('card');
       if (dragAndDropItems.sortable) {
-        dragAndDropItems.sortable.destroy(); // Уничтожаем старую инициализацию Sortable.js
+        dragAndDropItems.sortable.destroy(); 
       }
     
       new Sortable(dragAndDropItems, {

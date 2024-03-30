@@ -2,6 +2,7 @@ import subprocess
 import tkinter as tk
 from tkinter.scrolledtext import ScrolledText
 from tkinter import messagebox
+from tkinter import ttk
 import logging
 import threading
 import webbrowser
@@ -13,7 +14,7 @@ class TextLogHandler(logging.Handler):
 
     def emit(self, record):
         log_entry = self.format(record)
-        formatted_log_entry = format_log_entry(record)  # Форматирование текста
+        formatted_log_entry = format_log_entry(record) 
         self.text_widget.insert(tk.END, formatted_log_entry + "\n")
         self.text_widget.see(tk.END)
 
@@ -74,21 +75,23 @@ def on_closing():
 
 if __name__ == "__main__":
     root = tk.Tk()
+    style = ttk.Style()
+    style.theme_use("vista")
     root.title("Flask Server")
     root.protocol("WM_DELETE_WINDOW", on_closing)
 
-    ip_label = tk.Label(text="IP-адрес:")
-    ip_entry = tk.Entry()
+    ip_label = ttk.Label(text="IP-address:")
+    ip_entry = ttk.Entry()
 
-    port_label = tk.Label(text="Порт:")
-    port_entry = tk.Entry()
+    port_label = ttk.Label(text="Prot:")
+    port_entry = ttk.Entry()
     
-    text_widget = ScrolledText(root, height=20, width=80)
+    text_widget = ScrolledText(root,   bg='#000', fg='#0f0', height=20, width=80 )
     text_widget.pack(expand=True, fill=tk.BOTH)
 
-    start_button = tk.Button(text="Запуск", command=start_app)
-    stop_button = tk.Button(text="Остановить", command=stop_flask_server)
-    open_button = tk.Button(text="Перейти на сайт", command=lambda: open_webpage(ip_entry.get(), port_entry.get()))
+    start_button = ttk.Button(text="Start server", command=start_app )
+    stop_button = ttk.Button(text= "Stop  server", command=stop_flask_server)
+    open_button = ttk.Button(text="Go to web page", command=lambda: open_webpage(ip_entry.get(), port_entry.get()))
 
     ip_label.pack()
     ip_entry.pack()
@@ -103,7 +106,7 @@ if __name__ == "__main__":
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.INFO)
     handler = TextLogHandler(text_widget)
-    handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s: %(message)s'))  # Установка форматтера
+    handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s: %(message)s')) 
     logger.addHandler(handler)
 
     root.mainloop()
