@@ -26,7 +26,14 @@
     <a href="/" class="menu-item"><i class="fas fa-home fa-lg"></i>Home</a>
     <a href="#" class="menu-item menu-item-active"><i class="fas fa-chart-bar fa-lg"></i>Overview</a>
     <a href="/charts" class="menu-item"><i class="fas fa-tachometer-alt fa-lg"></i>Dashboard</a>
-    <a href="/login" action="/login" class="menu-item"><i class="fas fa-sign-out-alt fa-lg"></i>Log Out</a>
+    {% if not is_guest %}
+    <a href="/settings" class="menu-item"><i class="fas fa-gear fa-lg"></i>Settings</a>
+    {% endif %}
+    {% if hello_username == 'Guest' %}
+      <a href="/login" action="/login" class="menu-item"><i class="fas fa-sign-in-alt fa-lg"></i>Log In</a>
+    {% else %}
+      <a href="/logout" class="menu-item"><i class="fas fa-sign-out-alt fa-lg"></i>Log Out</a>
+    {% endif %}
   </div>
 
 

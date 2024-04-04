@@ -31,6 +31,7 @@ def stop_flask_server():
     if app_process and app_process.poll() is None:
         app_process.terminate()
         logger.info("Flask server stopped")
+        logger.warning("Это должно появиться как в консоли, так и в файле журнала")
 
 def open_webpage(ip_address, port):
     url = f"http://{ip_address}:{port}"
@@ -78,6 +79,7 @@ def on_closing():
 
 if __name__ == "__main__":
     root = tk.Tk()
+    root.iconbitmap("./static/smart-home.ico")
     style = ttk.Style()
     style.theme_use("vista")
     root.title("Flask Server")
@@ -115,7 +117,7 @@ if __name__ == "__main__":
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.INFO)
     handler = TextLogHandler(text_widget)
-    handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s: %(message)s')) 
+    handler.setFormatter(logging.Formatter('%(levelname)s: %(message)s')) 
     logger.addHandler(handler)
 
     root.mainloop()
