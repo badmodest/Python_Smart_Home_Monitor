@@ -13,9 +13,8 @@ class TextLogHandler(logging.Handler):
         self.text_widget = text_widget
 
     def emit(self, record):
-        log_entry = self.format(record)
-        formatted_log_entry = format_log_entry(record) 
-        self.text_widget.insert(tk.END, formatted_log_entry + "\n")
+        log_entry = self.format(record) 
+        self.text_widget.insert(tk.END, f"{log_entry}\n")
         self.text_widget.see(tk.END)
 
 server_started = False
@@ -51,20 +50,24 @@ def start_app():
 
     threading.Thread(target=start_flask_server, args=(ip_address, port), daemon=True).start()
     server_started = True
-    
-def format_log_entry(record):
-    log_entry = f"{record.levelname}: {record.msg}"
+
+
+
+"""
+def format_log_entry(record, text_widget):
+    log_entry = f"{record.levelname}: {record.msg}\n" 
+    text_widget.insert(tk.END, log_entry) 
+
     if record.levelname == "ERROR":
-        return f"<font color='red'>{log_entry}</font>"
+        text_widget.tag_add("error", "end-2c", "end-1c")  
     elif "POST" in log_entry or "GET" in log_entry:
         if "308" in log_entry:
-            return f"<font color='green'>{log_entry}</font>"
+            text_widget.tag_add("success", "end-2c", "end-1c") 
         elif "304" in log_entry:
-            return f"<font color='cyan'>{log_entry}</font>"
-    elif "404" in log_entry:
-        return f"<font color='red'>{log_entry}</font>"
-    return log_entry
-
+            text_widget.tag_add("modified", "end-2c", "end-1c") 
+        elif "404" in log_entry:
+            text_widget.tag_add("warning", "end-2c", "end-1c")  
+"""
 def on_closing():
     if messagebox.askokcancel("Quit", "Do you want to quit?"):
         if server_started:
@@ -92,6 +95,12 @@ if __name__ == "__main__":
     start_button = ttk.Button(text="Start server", command=start_app )
     stop_button = ttk.Button(text= "Stop  server", command=stop_flask_server)
     open_button = ttk.Button(text="Go to web page", command=lambda: open_webpage(ip_entry.get(), port_entry.get()))
+
+
+    text_widget.tag_configure("error", foreground="red")
+    text_widget.tag_configure("success", foreground="green")
+    text_widget.tag_configure("modified", foreground="cyan")
+    text_widget.tag_configure("warning", foreground="orange") 
 
     ip_label.pack()
     ip_entry.pack()

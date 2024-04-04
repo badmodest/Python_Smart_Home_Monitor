@@ -42,9 +42,12 @@
   </div>
   <div class="content">
     <h3 class="heading">Hey, {{ hello_username }} 👋 Yur device is <span id="status" data-status="{{ status }}">{{ status }}</span></h3>
+
     <hr class="rounded">
     
     <div class="grid-container"  id="agg">
+      <div class="backdrop">
+      </div>
       <div class="big-card">
         <div class="date-time-container">
           <p class="day">There</p>
@@ -55,11 +58,18 @@
       </div>
       <div class="grid">
         {% for sensor, data in sensor_data.items() %}
-          <div class="card">
-            <i class="f7-icons icon-in-card">{{ data.icon }}</i>
-            <h3 class="text">{{ sensor }}</h3>
-            <p class="text">Value: <span id="{{ sensor }}Value">{{ data.value }}</span> {{ data.unit }}</p>
+        <div class="card">
+          <i class="f7-icons icon-in-card">{{ data.icon }}</i>
+          <h3 class="text">{{ sensor }}</h3>
+          <p class="text">
+            Value:
+            <span id="{{ sensor }}">{{ data.value }}</span>
+            {{ data.unit }}
+          </p>
+          <div class="indicator">
+            <div class="bar" title="{{ data.value }}%" style="height: {{ data.value }}%"></div>
           </div>
+        </div>
         {% endfor %}
       </div>
       <div class="grid">
@@ -74,8 +84,6 @@
         </div>
     </div>
     </div>
-
-
 
     </div>
   </div>

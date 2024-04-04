@@ -12,7 +12,6 @@ import argparse
 import time
 import logging
 import tkinter as tk
-from tkinter import messagebox
 
 
 def read_settings():
@@ -118,6 +117,8 @@ for sensor in sensor_data:
 
 mqtt_client.loop_start()
 
+
+"""
 # def update_sensor_values():
 #     while True:
 #         for sensor in sensor_data:
@@ -143,10 +144,10 @@ mqtt_client.loop_start()
 #         writer.writeheader()
 #         for sensor, data in sensor_data.items():
 #             writer.writerow({'Sensor': sensor, 'Value': data['value'], 'Unit': data['unit']})
+"""
 
 
-
-##################################
+"""
 
 # @app.route('/editor')
 # def editor():
@@ -164,7 +165,7 @@ mqtt_client.loop_start()
 
 #     return jsonify({'success': True, 'message': 'Карточка успешно сохранена'})
 
-##################################
+"""
 
 
 
