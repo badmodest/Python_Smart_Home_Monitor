@@ -63,7 +63,8 @@
           <h3 class="text">{{ sensor }}</h3>
           <p class="text">
             Value:
-            <span id="{{ sensor }}">{{ data.value }}</span>
+            <span id="{{ sensor }}Value">{{ data.value }}</span>
+
             {{ data.unit }}
           </p>
           <div class="indicator">
@@ -170,9 +171,17 @@ window.addEventListener("click", (event) => {
           })
           .then(data => {
             Object.keys(data).forEach(sensor => {
-              document.getElementById(`${sensor}Value`).innerText = data[sensor].value;
+              document.getElementById(`${sensor}Value`).textContent = data[sensor].value;
             });
-  
+            Object.keys(data).forEach(sensor => {
+              const element = document.getElementById(`${sensor}Value`);
+              if (element) {
+                  element.innerText = data[sensor].value;
+              } else {
+                  console.error(`Element with id "${sensor}Value" not found`);
+              }
+          });
+          
            
             var settings = {
               "backgroundColor": "#333333", 

@@ -58,19 +58,24 @@ cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 app.secret_key = 'development key'
 passwords_file = 'static\\data\\passwd'
 settings = read_settings()
-mqtt_broker = settings['mqtt_broker']
-mqtt_port = int(settings['mqtt_port'])
+
+mqtt_broker = "192.168.31.94"
+mqtt_port = 1883
+
+#settings['mqtt_broker']
+#int(settings['mqtt_port'])
+
 hello_username = ""
 status = "Offline"
 last_update_time = datetime.now()
 sensor_data = {
-    "Temp": {"value": 25, "unit": "°C", "icon": "sun_max"},
-    "Value": {"value": 50, "unit": "%", "icon": "chart_bar_fill"},
-    "Pressure": {"value": 1015, "unit": "hPa", "icon": "tornado"},
+    "Temp": {"value": 0, "unit": "°C", "icon": "sun_max"},
+    "Humidity": {"value": 0, "unit": "%", "icon": "chart_bar_fill"},
+    "Pressure": {"value": 0, "unit": "hPa", "icon": "tornado"},
     "sensor1": {"value": 0, "unit": "NaN", "icon": "burn"},
-    "sensor3": {"value": 31, "unit": "Danon", "icon": "burn"},
-    "Battery": {"value": 4.4, "unit": "V", "icon": "bolt_horizontal_fill"},
-    "battery": {"value": 69, "unit": "%", "icon": "battery_25"},
+    "sensor3": {"value": 0, "unit": "Danon", "icon": "burn"},
+    "Battery": {"value": 0, "unit": "V", "icon": "bolt_horizontal_fill"},
+    "battery": {"value": 0, "unit": "%", "icon": "battery_25"},
 }
 data = []
 
@@ -85,13 +90,13 @@ def on_message(client, userdata, msg , rc):
 
     try:
         sensor_name = msg.topic.split("/")[-1]
-        sensor_value = float(msg.payload.decode("utf-8"))
+        sensor_data[sensor_name]["value"] = float(msg.payload.decode("utf-8"))
 
         # + данные в список
         data.append({
             "timestamp": datetime.now(),
             "sensor_name": sensor_name,
-            "value": sensor_value
+            "value": sensor_data
         })
 
         # Записc в CSV 
@@ -267,7 +272,7 @@ def read_settings():
     return settings
 
 def save_settings(settings):
-    with open('data/settings.csv', mode='w', newline='') as csvfile:
+    with open('static/data/settings.csv', mode='w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         for key, value in settings.items():
             writer.writerow([key, value])
