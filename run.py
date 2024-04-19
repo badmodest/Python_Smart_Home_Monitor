@@ -25,6 +25,13 @@ def start_flask_server(ip_address, port):
                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     for line in app_process.stdout:
         logger.info(line.strip())
+        
+def start_emulation():
+    global app_subprocess
+    app_subprocess = subprocess.Popen(["python", "run.py"],
+                                   stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=False)
+    for line in app_subprocess.stdout:
+        logger.info(line.strip())        
 
 def stop_flask_server():
     global app_process
@@ -96,6 +103,7 @@ if __name__ == "__main__":
 
     start_button = ttk.Button(text="Start server", command=start_app )
     stop_button = ttk.Button(text= "Stop  server", command=stop_flask_server)
+    emulate_button = ttk.Button(text= "Emutale ESP", command=start_emulation)
     open_button = ttk.Button(text="Go to web page", command=lambda: open_webpage(ip_entry.get(), port_entry.get()))
 
 
@@ -112,6 +120,7 @@ if __name__ == "__main__":
 
     start_button.pack()
     stop_button.pack()
+    emulate_button.pack()
     open_button.pack()
 
     logger = logging.getLogger(__name__)

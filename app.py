@@ -28,17 +28,10 @@ def read_settings():
         return {'mqtt_broker': '127.0.0.1', 'mqtt_port': '1883'}
 
 def run_flask_app(ip, port, log_field):
-    
     log_handler = TextLogHandler(log_field)
-
-    
     logger = logging.getLogger(__name__) 
-
-   
     logger.addHandler(log_handler)
-
     logger.info("Starting app")
-
     app.run(host=ip, port=port)
 
 class TextLogHandler(logging.Handler):
@@ -59,9 +52,8 @@ app.secret_key = 'development key'
 passwords_file = 'static\\data\\passwd'
 settings = read_settings()
 
-mqtt_broker = "192.168.31.94"
+mqtt_broker = "localhost"
 mqtt_port = 1883
-
 #settings['mqtt_broker']
 #int(settings['mqtt_port'])
 
@@ -80,26 +72,57 @@ sensor_data = {
 data = []
 
 
-def on_message(client, userdata, msg , rc):
-    if rc == 0:
-        print("Connected to MQTT broker!")
-    else:
-        print("Connection failed with code:", rc) 
+
+'''
+def connect_mqtt(client, rc):
+    try:
+        print("Connected with result code "+str(rc))
+
+        is_connected = True
+        for sensor in sensor_data:
+            print(f"RABOTA SENSOR topic/{sensor} ")
+            mqtt_topic = f"topic/{sensor}"
+            print("TOPIC IS........",mqtt_topic)
+            client.subscribe(mqtt_topic)
+        time.sleep(1)
+        if not client.is_connected():
+            is_connected = False
+            print("MQTT client not connected"+str(rc))
+
+    except Exception as e:
+        logging.error(f"MQTT connection failed: {e}")
+        is_connected = False
+
+    if is_connected:
+        print("MQTT client connected:", client.is_connected())
+        
+'''
+
+def on_connect(client, userdata, flags, rc):
+    print("Connected with result code "+str(rc))
+    for sensor in sensor_data:
+        mqtt_topic = f"topic/{sensor}"
+        client.subscribe(mqtt_topic)
+
+def on_message(client, userdata, msg):
+    print(f"Received message: {msg.topic} - {msg.payload.decode()}")
     global data
     global last_update_time
 
     try:
         sensor_name = msg.topic.split("/")[-1]
         sensor_data[sensor_name]["value"] = float(msg.payload.decode("utf-8"))
+        print(f"DATA IS", sensor_data[sensor_name]["value"])
+        print(f"LESS DATA IS", sensor_data)
 
-        # + данные в список
+        # Добавляем данные в список
         data.append({
             "timestamp": datetime.now(),
             "sensor_name": sensor_name,
             "value": sensor_data
         })
 
-        # Записc в CSV 
+        # Записываем в CSV 
         with open("static/data/dataa.csv", "w", newline="") as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(["timestamp", "sensor_name", "value"])
@@ -111,35 +134,20 @@ def on_message(client, userdata, msg , rc):
     except Exception as e:
         print(f"Error processing MQTT message: {e}")
 
+client = mqtt.Client(client_id="iMAC")
+client.on_connect = on_connect
+client.on_message = on_message
+if on_message:
+    print('NUBLAAA')
+client.connect(mqtt_broker, mqtt_port, 60)
+print(mqtt_broker,mqtt_port)
 
-mqtt_client = mqtt.Client(client_id="", protocol=mqtt.MQTTv5)
-mqtt_client.on_message = on_message
-mqtt_client.connect(mqtt_broker, mqtt_port, 60)
+client.loop_start()
 
-for sensor in sensor_data:
-    mqtt_topic = f"topic/{sensor}"
-    mqtt_client.subscribe(mqtt_topic)
 
-mqtt_client.loop_start()
 
 
 """
-# def update_sensor_values():
-#     while True:
-#         for sensor in sensor_data:
-#             if sensor.st artswith("sensor"):
-#                 sensor_data[sensor]["value"] = round(random.uniform(0, 100), 2)
-#             elif sensor == "Temp":
-#                 sensor_data[sensor]["value"] = round(random.uniform(15, 30), 2)
-#             elif sensor == "Battery":
-#                 sensor_data[sensor]["value"] = round(random.uniform(3.5, 4.2), 2)
-#             elif sensor == "battery":
-#                 sensor_data[sensor]["value"] = round(random.uniform(0, 100), 2)
-#             else:
-#                 sensor_data[sensor]["value"] = round(random.uniform(0, 100), 2)
-
-#         save_to_csv(sensor_data)
-#         time.sleep(10)
 
 # def save_to_csv(sensor_data):
 #     with open('sensor_data.csv', 'w', newline='') as csvfile:
@@ -172,9 +180,18 @@ mqtt_client.loop_start()
 
 """
 
-
-
-
+"""
+client = mqtt.Client(client_id="iMAC")
+client.on_message = on_connect
+client.on_message = on_message
+if on_message:
+    print('NUBLAAA')
+#client.connect(mqtt_broker, mqtt_port, 60)
+client.connect("localhost", 1883, 60)
+print(mqtt_broker,mqtt_port)
+client.loop_start()
+#client.loop_forever()
+"""
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -260,7 +277,7 @@ def charts():
     return render_template("charts.html", sensor_data=sensor_data)
 
 def read_settings():
-    settings = {'mqtt_broker': '127.0.0.1', 'mqtt_port': '1883'}
+    settings = {'mqtt_broker': '192.168.31.94', 'mqtt_port': '1883'}
     try:
         with open('data/settings.csv', mode='r') as csvfile:
             reader = csv.reader(csvfile)
@@ -319,6 +336,7 @@ def save_topic_settings(topic_settings):
 
 @app.route("/data")
 def get_data():
+    print("OTPRAVKA",data)
     return json.dumps(sensor_data)
 
 @app.errorhandler(404)
@@ -341,9 +359,9 @@ if __name__ == '__main__':
     parser.add_argument("--ip", help="IP address", default="192.168.31.94")
     parser.add_argument("--port", help="Port number", type=int, default=80)
     parser.add_argument("--silent", help="Suppress logging", action="store_true")
-
     args = parser.parse_args()
-
+    
+    
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.INFO)
     logger.info("Starting app")

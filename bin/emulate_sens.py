@@ -4,8 +4,8 @@ import random
 
 mqtt_broker = "192.168.31.94"
 mqtt_port = 1883
-temp_topics = ["topic/Temp", "topic/Battery"]
-sensor_topics = ["topic/Value", "topic/Pressure", "topic/sensor1", "topic/battery"]
+temp_topics = ["topic/Temp"]
+sensor_topics = ["topic/Value", "topic/Pressure"]
 
 def emulate_sensors():
     while True:

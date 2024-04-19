@@ -90,6 +90,7 @@
   </div>
 
   <script>
+    /*
     const card = document.querySelector(".card");
 const popup = document.getElementById("popup");
 
@@ -126,7 +127,7 @@ window.addEventListener("click", (event) => {
     });
 
 
-
+    */ 
 
 
     function updateDateTime() {
@@ -171,7 +172,9 @@ window.addEventListener("click", (event) => {
           })
           .then(data => {
             Object.keys(data).forEach(sensor => {
+              console.log(`${sensor}Value`);
               document.getElementById(`${sensor}Value`).textContent = data[sensor].value;
+              console.log(data[sensor].value);
             });
             Object.keys(data).forEach(sensor => {
               const element = document.getElementById(`${sensor}Value`);
