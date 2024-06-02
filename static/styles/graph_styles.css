@@ -1,0 +1,146 @@
+   body {
+            font-family: "Lexend", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 650;
+            font-style: normal;
+            background-color: #f4f4f4;
+            transition: all .3s ease-in-out;
+        }
+
+        .over-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 20px auto;
+            width: 80%;
+        }
+
+        .card-header {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        h2 {
+            margin: 0;
+            font-size: 1.2em;
+        }
+
+        .chart-container {
+            width: 80%;
+            margin: 20px auto;
+            height: 400px;
+            overflow-x: auto;
+            scrollbar-width: thin; 
+            scrollbar-color: #f54436 #f0f0f0; 
+        }
+
+        .chart-container::-webkit-scrollbar { 
+            height: 8px;
+        }
+
+        .chart-container::-webkit-scrollbar-track {
+            background: #f0f0f0;
+        }
+
+        .chart-container::-webkit-scrollbar-thumb {
+            background-color: #f54436;
+            border-radius: 4px;
+            border: 1px solid #f0f0f0;
+        }
+
+        canvas {
+            width: fit-content; 
+            min-width: 100%;   
+        }
+
+        .seekbar-container {
+            width: 80%;
+            margin: 20px auto;
+        }
+        
+        .seekbar {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            background: #f0f0f0; 
+            border-radius: 4px;
+            outline: none; 
+        }
+        
+        .seekbar::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px; 
+            background: #f54436; 
+            cursor: pointer;
+            border-radius: 50%;
+            border: 2px solid #fff; 
+        }
+        
+        .seekbar::-moz-range-thumb { 
+            width: 16px;
+            height: 16px;
+            background: #f54436;
+            cursor: pointer;
+            border-radius: 50%;
+            border: 2px solid #fff;
+        }
+        
+        .seekbar:focus {
+            outline: none; 
+        }
+        
+        .seekbar:focus::-webkit-slider-thumb { 
+            box-shadow: 0 0 0 3px rgba(245, 68, 54, 0.3);
+        }
+        input[type=range] {
+            width: 100%;
+        }
+
+        .bback-button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #007bff; 
+            color: #fff;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        i.f7-icons {
+            font-size: 1.2em;  
+            margin-right: 5px;
+        }
+        .input,.back-button, .next-button {
+            font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","Roboto","Oxygen","Ubuntu","Cantarell","Fira Sans","Droid Sans","Helvetica Neue",sans-serif;
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--white);
+            background-color: var(--main-bg-color);
+            box-shadow: 0 0 .4vw rgba(0,0,0,0.5), 0 0 0 .15vw transparent;
+            border-radius: 0.4vw;
+            border: none;
+            outline: none;
+            width: 8%;
+            padding: 0.4%;
+            max-width: 190px;
+            transition: .4s;
+            -webkit-transition: .4s;
+            -moz-transition: .4s;
+            -ms-transition: .4s;
+            -o-transition: .4s;
+          }
+          
+          .input,.back-button:hover,.next-button:hover {
+            box-shadow: 0 0 0 .15vw rgba(135, 207, 235, 0.186);
+          }
+          
+          .input,.button:focus {
+            box-shadow: 0 0 0 .15vw var(--blue);
+          }
+          

@@ -52,23 +52,38 @@ app.secret_key = 'development key'
 passwords_file = 'static\\data\\passwd'
 settings = read_settings()
 
-mqtt_broker = "localhost"
+mqtt_broker = "192.168.31.94"
 mqtt_port = 1883
 #settings['mqtt_broker']
 #int(settings['mqtt_port'])
-
+power_state_topic = "stat/topic/RESULT"
+power_command_topic = "cmnd/topic/POWER"
+current_state = "Unknown" 
 hello_username = ""
 status = "Offline"
 last_update_time = datetime.now()
+
+def load_sensor_data(filename="sensor_data.json"):
+
+    try:
+        with open(filename, "r") as file:
+            return json.load(file)
+    except FileNotFoundError:
+        return {}
+
+sensor_data = load_sensor_data()
+
+'''
 sensor_data = {
-    "Temp": {"value": 0, "unit": "°C", "icon": "sun_max"},
-    "Humidity": {"value": 0, "unit": "%", "icon": "chart_bar_fill"},
-    "Pressure": {"value": 0, "unit": "hPa", "icon": "tornado"},
-    "sensor1": {"value": 0, "unit": "NaN", "icon": "burn"},
-    "sensor3": {"value": 0, "unit": "Danon", "icon": "burn"},
-    "Battery": {"value": 0, "unit": "V", "icon": "bolt_horizontal_fill"},
+    "Temperature": {"value": 0, "unit": "°C", "icon": "sun_max"},
+    "Humidity": {"value": 0, "unit": "%", "icon": "drop"},
+    "Pressure": {"value": 0, "unit": "hPa", "icon": "chevron_up_chevron_down"},
+    "CO2": {"value": 0, "unit": "PPM", "icon": "wind"},
+    "Inside": {"value": 0, "unit": "Danon", "icon": "burn"},
+    "Outside": {"value": 0, "unit": "V", "icon": "bolt_horizontal_fill"},
     "battery": {"value": 0, "unit": "%", "icon": "battery_25"},
 }
+'''
 data = []
 
 
@@ -97,39 +112,40 @@ def connect_mqtt(client, rc):
         print("MQTT client connected:", client.is_connected())
         
 '''
-
 def on_connect(client, userdata, flags, rc):
-    print("Connected with result code "+str(rc))
+    print("Connected with result code " + str(rc))
     for sensor in sensor_data:
         mqtt_topic = f"topic/{sensor}"
         client.subscribe(mqtt_topic)
+    client.subscribe(power_state_topic) 
+    client.publish(power_state_topic, " ") # Публикуем пустое сообщение, чтобы Tasmota отправила текущее состояние
 
 def on_message(client, userdata, msg):
-    print(f"Received message: {msg.topic} - {msg.payload.decode()}")
-    global data
-    global last_update_time
+    global data, last_update_time, current_state
 
     try:
-        sensor_name = msg.topic.split("/")[-1]
-        sensor_data[sensor_name]["value"] = float(msg.payload.decode("utf-8"))
-        print(f"DATA IS", sensor_data[sensor_name]["value"])
-        print(f"LESS DATA IS", sensor_data)
+        payload = msg.payload.decode()
+        print(f"Received message on topic '{msg.topic}': {payload}")  # Отладка
 
-        # Добавляем данные в список
-        data.append({
-            "timestamp": datetime.now(),
-            "sensor_name": sensor_name,
-            "value": sensor_data
-        })
+        if msg.topic == power_state_topic:
+            current_state = json.loads(payload)["POWER"]
+            client.publish("web_ui/topic/switch", current_state)
+        else:
+            sensor_name = msg.topic.split("/")[-1]
+            if sensor_name in sensor_data:
+                sensor_data[sensor_name]["value"] = float(payload)
 
-        # Записываем в CSV 
-        with open("static/data/dataa.csv", "w", newline="") as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerow(["timestamp", "sensor_name", "value"])
-            for data_point in data:
-                writer.writerow([data_point["timestamp"], data_point["sensor_name"], data_point["value"]])
+                # Добавляем данные в список (только значение сенсора)
+                data.append({
+                    "timestamp": datetime.now(),
+                    "sensor_name": sensor_name,
+                    "value": sensor_data[sensor_name]["value"]  # Записываем только значение
+                })
 
-        last_update_time = datetime.now()
+                # Записываем в CSV (только значение сенсора)
+                with open("static/data/dataa.csv", "a", newline="") as csvfile:  # Используем 'a' для добавления
+                    writer = csv.writer(csvfile)
+                    writer.writerow([datetime.now(), sensor_name, sensor_data[sensor_name]["value"]])
 
     except Exception as e:
         print(f"Error processing MQTT message: {e}")
@@ -242,11 +258,10 @@ def logout():
     session.pop('logged_in', None)
     return redirect(url_for('login'))
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 @cache.cached(timeout=60)
 def index():
-    global status, last_update_time
-
+    global status, last_update_time, current_state
     time_difference = datetime.now() - last_update_time
     if time_difference.total_seconds() > 10:
         status = "Offline"
@@ -262,7 +277,18 @@ def index():
         session['logged_in'] = True
         session['hello_username'] = 'Guest'
 
-    return render_template("index.html", sensor_data=sensor_data, hello_username=hello_username, is_guest=is_guest, status=status)
+    if request.method == "POST":
+        switch_state = request.form.get("switch")
+        print("свич стейт",switch_state) # Добавьте эту строку для отладки
+        if switch_state == "on":
+            client.publish(power_command_topic, "ON")
+            print("VKLUCHAUUUU")
+        elif switch_state == "off":
+            client.publish(power_command_topic, "OFF")
+            print("OFFFFFFFFFFFFF")
+    temp = sensor_data['Temperature']['value']
+    print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",temp)
+    return render_template("index.html", sensor_data=sensor_data, hello_username=hello_username, is_guest=is_guest, status=status, state=current_state, temp=temp)
 
 @app.route("/overview")
 def overview():
@@ -275,6 +301,11 @@ def charts():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     return render_template("charts.html", sensor_data=sensor_data)
+
+@app.route('/sensor_graph/<sensor_name>')
+def sensor_graph(sensor_name):
+    return render_template('sensor_graph.html', sensor_name=sensor_name )
+
 
 def read_settings():
     settings = {'mqtt_broker': '192.168.31.94', 'mqtt_port': '1883'}
@@ -313,7 +344,7 @@ def settings_route():
         mqtt_settings = read_settings()
         topic_settings = read_topic_settings()
         return render_template("settings.html", mqtt_broker=mqtt_settings['mqtt_broker'],
-                               mqtt_port=mqtt_settings['mqtt_port'], topic_settings=topic_settings)
+                               mqtt_port=mqtt_settings['mqtt_port'], topic_settings=topic_settings, sensor_data=sensor_data)
 
 def read_topic_settings():
     topic_settings = {}
@@ -336,8 +367,9 @@ def save_topic_settings(topic_settings):
 
 @app.route("/data")
 def get_data():
-    print("OTPRAVKA",data)
-    return json.dumps(sensor_data)
+    print("OTPRAVKA", data)
+    return jsonify({**sensor_data, "current_state": current_state})
+
 
 @app.errorhandler(404)
 @app.errorhandler(500)
@@ -367,7 +399,7 @@ if __name__ == '__main__':
     logger.info("Starting app")
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
     file_handler = logging.FileHandler('flask.log')
-    file_handler.setLevel(logging.INFO)
+    file_handler.setLevel(logging.ERROR)
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
 

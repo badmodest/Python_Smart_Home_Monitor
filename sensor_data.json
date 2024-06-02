@@ -1,0 +1,37 @@
+{
+    "Temperature": {
+        "value": 0,
+        "unit": "\u0412\u00b0C",
+        "icon": "sun_max"
+    },
+    "Humidity": {
+        "value": 0,
+        "unit": "%",
+        "icon": "drop"
+    },
+    "Pressure": {
+        "value": 0,
+        "unit": "hPa",
+        "icon": "chevron_up_chevron_down"
+    },
+    "CO2": {
+        "value": 0,
+        "unit": "PPM",
+        "icon": "wind"
+    },
+    "Inside": {
+        "value": 0,
+        "unit": "Danon",
+        "icon": "burn"
+    },
+    "Outside": {
+        "value": 0,
+        "unit": "V",
+        "icon": "bolt_horizontal_fill"
+    },
+    "battery": {
+        "value": 0,
+        "unit": "%",
+        "icon": "battery_25"
+    }
+}

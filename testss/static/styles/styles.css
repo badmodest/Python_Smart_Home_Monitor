@@ -258,13 +258,6 @@ grid-column-start: 1;
 
 }
 
-.cozy-color{
-  color: var(--d_pinky);
-  background-color: var(--pinky);
-}
-  
-
-
 .temp-color{
   color: #000;
   background-color: #e7e7e7;
@@ -303,35 +296,32 @@ grid-column-start: 1;
   box-shadow: inset 35px 0 0 0 rgba(0, 0, 0, 0.2);
 }
 
-.date-time-container,.feels-like-container {
+.date-time-container {
   align-items: center;
   justify-content: space-between;
 }
-.feels-like-container{
-  color: #146964;
-}
-.month,.m {
+
+.month {
   font-size: 26px;
   font-weight: 300;
   margin: 0px
 }
 
-.day,.d{
+.day{
   font-size: 20px;
   font-weight: 1300;
   margin: 0px 0px 0px 0px;
 }
 
 
-.date,.dd {
+.date {
   font-size: 24px;
   font-weight: bold;
   margin: 0px 0px 0px 0px;
   
 }
 
-.time,.t {
-  color: #000;
+.time {
   font-size: 51px;
   font-weight: 800;
   margin-top: 10px;
@@ -448,17 +438,6 @@ color: var(--white)
   content: 'Saved!';
 }
 
-.inputt{
-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","Roboto","Oxygen","Ubuntu","Cantarell","Fira Sans","Droid Sans","Helvetica Neue",sans-serif;
-  font-weight: 500;
-  font-size: 14px;
-  margin: 12px 10px 20px 0px;
-  color: var(--white);
-  background-color: var(--main-bg-color);
-  box-shadow: 0 0 .4vw rgba(0,0,0,0.5), 0 0 0 .15vw transparent;
-  border: none;
-  outline: none;
-}
 
 #popup {
   position: fixed;

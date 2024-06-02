@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ sensor_name }} Graph</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/framework7-icons/css/framework7-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/graph_styles.css') }}">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='/favicon.ico') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+
+</head>
+<body>
+    <div class="button-container">
+        <button class="back-button" onclick="window.location.href='/'">
+            <i class="f7-icons">arrowtriangle_up_fill</i>Back to Home</button>
+        <button class="next-button" onclick="goToPreviousSensor('{{ sensor_name }}')">
+             Prev Sensor<i class="f7-icons">arrowtriangle_left_fill</i></button>
+        <button class="next-button" onclick="goToNextSensor('{{ sensor_name }}')">
+            <i class="f7-icons">arrowtriangle_right_fill</i>Next Sensor</button>
+    </div>
+    <div class="over-card temp-color">
+        <div class="card-header">
+            <h2>{{ sensor_name }}</h2>
+            <div id="averageValue"></div>
+        </div>
+        <div class="card-body">
+            <div class="chart-container">
+                <canvas id="{{ sensor_name }}Canvas"></canvas>
+            </div>
+        </div>
+        <div class="seekbar-container">
+            <input type="range" min="0" max="100" value="100" class="seekbar" id="{{ sensor_name }}Seekbar">
+        </div>
+        <div class="visible-points-container">
+            <label for="visiblePointsInput">Visible Points:</label>
+            <input type="number" id="visiblePointsInput" min="1" value="20">
+        </div>
+    </div>
+
+    <script>
+        async function getData(sensorName) {
+            const response = await fetch("/static/data/dataa.csv");
+            const text = await response.text();
+            const data = Papa.parse(text, { header: true }).data;
+        
+            const filteredData = data.filter(row => row.sensor_name === sensorName);
+        
+            const datasets = [{
+                label: sensorName,
+                fill: true,
+                data: filteredData.map(row => ({
+                    x: new Date(row.timestamp),
+                    y: parseFloat(row.value)
+                })),
+                borderColor: "#f54436",
+                backgroundColor: "rgba(245, 68, 54, 0.5)",
+                borderWidth: 2,
+                pointRadius: 2,
+                tension: 0.2,
+            }];
+        
+            let visiblePoints = 20;
+            const ctx = document.getElementById(`${sensorName}Canvas`).getContext("2d");
+            const averageValueElement = document.getElementById("averageValue");
+            function createChart(startIndex) {
+                const endIndex = Math.min(startIndex + visiblePoints, datasets[0].data.length);
+                const visibleValues = datasets[0].data.slice(startIndex, endIndex).map(d => d.y);
+                const average = visibleValues.reduce((sum, value) => sum + value, 0) / visibleValues.length;
+                averageValueElement.textContent = `Average: ${average.toFixed(2)}`; 
+                const chart = new Chart(ctx, {
+                    type: "line",
+                    data: {
+                        datasets: datasets,
+                    },
+                    options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    pan: {
+                        enabled: true,
+                        mode: 'x',
+                     },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: "top",
+                        },
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            min: datasets[0].data[startIndex].x.getTime(),
+                            max: datasets[0].data[endIndex - 1].x.getTime(),
+                            ticks: {
+                                autoSkip: true,
+                                maxTicksLimit: 10,
+                                callback: function(value, index, values) {
+                                    return new Date(value).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Time'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: sensorName
+                            },
+                            suggestedMin: Math.min(...datasets[0].data.map(d => d.y)) - 2,
+                            suggestedMax: Math.max(...datasets[0].data.map(d => d.y)) + 2,
+                        }
+                    },
+                    pan: {
+                        enabled: true,
+                        mode: 'x',
+                        onPan: function({chart}) {
+                            chart.update('none');
+                        }
+                    },
+                }
+            });
+            return chart;
+        }
+
+        let chart = createChart(datasets[0].data.length - visiblePoints); 
+
+        const seekbar = document.getElementById("{{ sensor_name }}Seekbar");
+        seekbar.addEventListener('input', function() {
+            const totalPoints = datasets[0].data.length;
+            const newStartIndex = Math.round((totalPoints - visiblePoints) * (this.value / 100));
+            chart.destroy();
+            chart = createChart(newStartIndex);
+        });
+        const visiblePointsInput = document.getElementById("visiblePointsInput");
+        visiblePointsInput.addEventListener('input', function() {
+            visiblePoints = parseInt(this.value, 10) || 20;
+            chart.destroy();
+            chart = createChart(datasets[0].data.length - visiblePoints);
+        });
+    }
+
+    getData('{{ sensor_name }}');
+
+        function goToNextSensor(currentSensor) {
+            const sensorOrder = ["Temperature", "Humidity", "Pressure", "CO2","Inside","Outside","battery"];
+            const currentIndex = sensorOrder.indexOf(currentSensor);
+            const nextIndex = (currentIndex + 1) % sensorOrder.length;
+            const nextSensor = sensorOrder[nextIndex];
+            window.location.href = "/sensor_graph/" + nextSensor;
+        }
+        function goToPreviousSensor(currentSensor) {
+            const sensorOrder = ["Temperature", "Humidity", "Pressure", "CO2","Inside","Outside","battery"];
+            const currentIndex = sensorOrder.indexOf(currentSensor);
+            const prevIndex = (currentIndex - 1 + sensorOrder.length) % sensorOrder.length; 
+            const prevSensor = sensorOrder[prevIndex];
+            window.location.href = "/sensor_graph/" + prevSensor;
+        }
+</script>
+</body>
+</html>

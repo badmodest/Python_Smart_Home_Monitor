@@ -46,44 +46,127 @@
     <hr class="rounded">
     
     <div class="grid-container"  id="agg">
-      <div class="backdrop--------------">
-      </div>
-      <div class="big-card">
-        <div class="date-time-container">
-          <p class="day">There</p>
-          <p class="month">sould be</p>
-          <p class="date">your date</p>
-        </div>
-        <p class="time">sad...</p>
-      </div>
-      <div class="grid">
-        {% for sensor, data in sensor_data.items() %}
-        <div class="card">
-          <i class="f7-icons icon-in-card">{{ data.icon }}</i>
-          <h3 class="text">{{ sensor }}</h3>
-          <p class="text">
-            Value:
-            <span id="{{ sensor }}Value">{{ data.value }}</span>
 
-            {{ data.unit }}
-          </p>
-          <div class="indicator">
-            <div class="bar" title="{{ data.value }}%" style="height: {{ data.value }}%"></div>
-          </div>
-        </div>
-        {% endfor %}
+    <div class="big-card">
+      <div class="date-time-container">
+        <p class="day">There</p>
+        <p class="month">sould be</p>
+        <p class="date">your date</p>
       </div>
+      <p class="time">sad...</p>
+    </div>
+
+    <div class="big-card  cozy-color">
+      <div class="date-time-container">
+          <p class="d">The weather</p>
+          <p class="m">feels like</p>
+          <p class="dd" id="temperature-description">...</p>
+      </div>
+       <div class="t"id="temperature-emoji"></div> 
+  </div>
+  
+  <script>
+      const temp = 15; // Передаем температуру из Django
+  
+      const temperatureDescription = document.getElementById('temperature-description');
+      const temperatureEmoji = document.getElementById('temperature-emoji');
+      {% if temp >= 25 %}
+      temperatureDescription.textContent = "It's hot";
+      temperatureEmoji.textContent = ";_;";
+  {% elif temp >= 15 %}
+      temperatureDescription.textContent = "Cozy";
+      temperatureEmoji.textContent = "^_^";
+  {% elif temp >= 5 %}
+      temperatureDescription.textContent = "Chilly";
+      temperatureEmoji.textContent = "^_~";
+  {% elif temp == 0 %} 
+      temperatureDescription.textContent = "Something wrong";
+      temperatureEmoji.textContent = "X﹏X";
+  {% else %}
+      temperatureDescription.textContent = "It's cold";
+      temperatureEmoji.textContent = "~_~";
+  {% endif %}
+  
+  </script>
+  <div class="grid">
+    {% for sensor, data in sensor_data.items() %}
+        <div class="card" onclick="goToSensorGraph('{{ sensor }}')">
+            <i class="f7-icons icon-in-card">{{ data.icon }}</i>
+            <h3 class="text">{{ sensor }}</h3>
+            <p class="text">
+                Value:
+                <span id="{{ sensor }}Value">{{ data.value }}</span>
+                {{ data.unit }}
+            </p>
+        </div>
+    {% endfor %}
+</div>
+
+<script>
+  function goToSensorGraph(sensorName) {
+    window.location.href = "/sensor_graph/" + sensorName; 
+}
+</script>
+
       <div class="grid">
       <div class="big-card some-color">
-        <h2 class="some-color">Some textttttttttttt </h2>
-        <h3 class="some-color">Another one </h3>
+        <h2 class="some-color">State: {{ state }}</h2>
+        <h3 class="some-color">Smart rozetka</h3>
       </div>
       <div class="big-card">
         <div class="slider-container">
-          <h3 for="switch">Toggle: On/Off</h3>
-          <input type="checkbox" id="switch" class="switch" >
-        </div>
+          <label for="switch">Toggle: On/Off</label>
+          <input type="checkbox" id="switch" class="switch" onchange="toggleSwitch(this)" {% if current_state == "ON" %}checked{% endif %}> 
+      </div>
+      
+      <script>
+      const checkbox = document.getElementById("switch");
+      
+function toggleSwitch(checkbox) {
+    const state = checkbox.checked ? "on" : "off";
+    fetch("/", {  // Отправка состояния переключателя на '/'
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `switch=${state}`
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok.');
+        }
+        return response.text();
+    })
+    .then(data => {
+        console.log('Success:', data); 
+    })
+    .catch(error => {
+        console.error('There has been a problem with your fetch operation:', error);
+        checkbox.checked = !checkbox.checked; 
+    });
+    function toggleSwitch(checkbox) {
+      const state = checkbox.checked ? "on" : "off";
+      fetch("/", {  // Отправка состояния переключателя на '/'
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: `switch=${state}`
+      })
+      .then(response => {
+          if (!response.ok) {
+              throw new Error('Network response was not ok.');
+          }
+          return response.text();
+      })
+      .then(data => {
+          console.log('Success:', data); 
+      })
+      .catch(error => {
+          console.error('There has been a problem with your fetch operation:', error);
+          checkbox.checked = !checkbox.checked; 
+      });
+      </script>
     </div>
+    
+
+    
     </div>
 
     </div>
@@ -192,6 +275,8 @@ window.addEventListener("click", (event) => {
               "chartLinesColor": "#fff",
               "textColor": "#fff"
             };
+            const checkbox = document.getElementById("switch");
+            checkbox.checked = data.current_state === "ON"; 
           })
           .catch(error => {
             console.error(error);
