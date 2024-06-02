@@ -280,7 +280,7 @@ def index():
 
     if request.method == "POST":
         switch_state = request.form.get("switch")
-        print("свич стейт",switch_state) # Добавьте эту строку для отладки
+        print("свич стейт",switch_state)
         if switch_state == "on":
             client.publish(power_command_topic, "ON")
             print("VKLUCHAUUUU")
