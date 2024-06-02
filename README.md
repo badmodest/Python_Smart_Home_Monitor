@@ -24,6 +24,8 @@ Smart Home Monitor is a web application that allows you to monitor and visualize
 
 <div align="center">
     <img src="assets/screenshot1.png" width="75%" height="75%">
+    <img src="assets/screenshot2.png" width="75%" height="75%">
+    <img src="assets/screenshot3.png" width="75%" height="75%">
 </div>
 
 ## 👩‍💻 Prerequisites
