@@ -17,7 +17,6 @@ Smart Home Monitor is a web application that allows you to monitor and visualize
 
 - Real-time monitoring of sensor data
 - Visualization of sensor data with charts
-- Dark and light theme toggle
 - User-friendly interface for easy navigation
 
 ### Screenshots
