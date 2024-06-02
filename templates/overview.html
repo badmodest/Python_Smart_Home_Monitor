@@ -47,7 +47,7 @@
 
       <div class="grid">
         {% for sensor, data in sensor_data.items() %}
-          <div class="over-card temp-color "> <div class="card-header">
+          <div class="over-card temp-color "onclick="goToSensorGraph('{{ sensor }}')"> <div class="card-header">
               <h2>{{ sensor }}</h2>
             </div>
             <div class="card-body">
@@ -63,7 +63,11 @@
       </div>
       
     
-
+      <script>
+        function goToSensorGraph(sensorName) {
+          window.location.href = "/sensor_graph/" + sensorName; 
+      }
+      </script>
 
 
     </div>
@@ -75,103 +79,111 @@
       const response = await fetch("/static/data/dataa.csv");
       const text = await response.text();
       const data = Papa.parse(text, { header: true }).data;
-    
+  
       const graphData = {};
       for (const row of data) {
-        const sensorName = row.sensor_name;
-        if (!graphData[sensorName]) {
-          graphData[sensorName] = {
-            timestamps: [],
-            values: []
-          };
-        }
-    
-        const date = new Date(row.timestamp);
-        const formattedDate = date.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "numeric",
-          day: "numeric",
-          hour: "numeric",
-          minute: "numeric",
-          second: "numeric",
-          hour12: false,
-        });
-        graphData[sensorName].timestamps.push(formattedDate);
-        graphData[sensorName].values.push(row.value);
+          const sensorName = row.sensor_name;
+          if (!graphData[sensorName]) {
+              graphData[sensorName] = {
+                  timestamps: [],
+                  values: []
+              };
+          }
+  
+          const date = new Date(row.timestamp);
+          graphData[sensorName].timestamps.push(date);
+          graphData[sensorName].values.push(row.value);
       }
-
-       for (const [sensor, sensorData] of Object.entries(graphData)) {
-        const ctx = document.getElementById(`${sensor}Canvas`).getContext("2d");
-        var gradient = ctx.createLinearGradient(0, 0, 0, 400);
-        gradient.addColorStop(0, 'rgba(245,68,54,1)');
-        gradient.addColorStop(0.3, 'rgba(245,68,54,0)');   
-        gradient.addColorStop(1, 'rgba(245,68,54,0)');
-        const chart = new Chart(ctx, {
-          type: "line",
-          data: {
-            labels: sensorData.timestamps,
-            datasets: [{
+  
+      const visiblePoints = 20;
+  
+      for (const [sensor, sensorData] of Object.entries(graphData)) {
+          const ctx = document.getElementById(`${sensor}Canvas`).getContext("2d");
+          var gradient = ctx.createLinearGradient(0, 0, 0, 400);
+          gradient.addColorStop(0, 'rgba(245,68,54,1)');
+          gradient.addColorStop(0.3, 'rgba(245,68,54,0)');   
+          gradient.addColorStop(1, 'rgba(245,68,54,0)');
+          
+          // Slice to get the last 20 data points
+          const last20Timestamps = sensorData.timestamps.slice(-visiblePoints);
+          const last20Values = sensorData.values.slice(-visiblePoints);
+  
+          const datasets = [{
               label: sensor, 
               fill: true,
-              data: sensorData.values,
+              data: last20Values.map((value, index) => ({ x: last20Timestamps[index].getTime(), y: value })), // Convert to timestamp
               borderColor: "#f54436",
-
               backgroundColor: gradient,
               borderWidth: 2,
-              pointRadius: 4,
-              pointBackgroundColor: "#f54436",
-              pointBorderColor: "#f54436",
-              tension: 0.4,
               pointRadius: 0,
-            }],
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: {
-                display: false,
+              tension: 0.4,
+          }];
+  
+          const chart = new Chart(ctx, {
+              type: "line",
+              data: {
+                  labels: last20Timestamps,
+                  datasets: datasets,
               },
-              tooltips: {
-                enabled: false,
+              options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                      legend: {
+                          display: false,
+                      },
+                      tooltips: {
+                          enabled: false,
+                      },
+                      title: {
+                          display: false,
+                      },
+                      point: {
+                          enabled: false,
+                      },
+                  },
+                  scales: {
+                      x: {
+                          type: 'linear', // Use a linear scale for timestamps
+                          ticks: {
+                              callback: function(value, index, values) {
+                                  return new Date(value).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); 
+                              },
+                              autoSkip: true,
+                              maxTicksLimit: 10, // You can adjust the number of ticks as needed
+                          },
+                          title: {
+                              display: false,
+
+                          },
+                                          border: {
+                                              display: false,
+                                            },
+                                            grid: {
+                                              display: false,
+                                            },
+                                            ticks: {
+                                              display: false,
+                                            },
+                      },
+                      y: {
+                          border: {
+                              display: false,
+                          },
+                          grid: {
+                              display: false,
+                          },
+                          ticks: {
+                              display: false,
+                          },
+                      },
+                  },
               },
-              title: {
-                display: false,
-              },
-              point: {
-                enabled: false,
-              },
-            },
-            scales: {
-              x: {
-                border: {
-                  display: false,
-                },
-                grid: {
-                  display: false,
-                },
-                ticks: {
-                  display: false,
-                },
-              },
-              y: {
-                border: {
-                  display: false,
-                },
-                grid: {
-                  display: false,
-                },
-                ticks: {
-                  display: false,
-                },
-              },
-            },
-          },
-        });
+          });
       }
-    }
-    
-    getData();
+  }
+  
+  getData();
     
 
 function processTooltipModel(model) {

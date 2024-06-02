@@ -12,8 +12,9 @@ import argparse
 import time
 import logging
 import tkinter as tk
-
-
+import psutil
+import platform
+import socket 
 def read_settings():
     try:
         with open('static/data/settings.csv', mode='r', newline='') as csvfile:
@@ -384,6 +385,20 @@ def get_notification():
         return jsonify({'message': 'Значение I больше 30!'})
     else:
         return jsonify({'message': ''})
+
+@app.route('/server_info')
+def server_info():
+    ram = psutil.virtual_memory()
+
+    data = {
+        'server_name': socket.gethostname(),
+        'os': f"{platform.system()} {platform.release()}",
+        'environment': 'production',
+        'ram_usage': ram.used // (1024 ** 2),
+        'ram_total': ram.total // (1024 ** 2),
+    }
+    print("DATA IS", data)
+    return render_template('server_info.html', **data)
 
 
 if __name__ == '__main__':

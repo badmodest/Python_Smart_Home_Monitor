@@ -257,13 +257,27 @@ grid-column-start: 1;
   grid-row-end: 2;
 
 }
+.info{
+  background-color: var(--cyan);
+  border: 1px solid var(--d_cyan);
+  border-radius: 20px;
+  box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+  padding: 2%;
+  transition: all 0.5s;
+  color: var(--black);
+  max-height: 25%;
+  }
 
 .cozy-color{
   color: var(--d_pinky);
   background-color: var(--pinky);
 }
   
-
+i.f7-icons {
+  font-size: 1.2em;  
+  margin-right: 5px;
+}
 
 .temp-color{
   color: #000;
