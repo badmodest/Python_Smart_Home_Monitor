@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/framework7-icons/css/framework7-icons.css">
 <link rel="stylesheet" href="{{ url_for('static', filename='styles/styles.css') }}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.css">
-  <title>Smart Home Monitor</title>
+  <title>Settings</title>
 </head>
 <body>
   <div class="bottom-menu">
@@ -36,8 +36,11 @@
     {% endif %}
   </div>
   <div class="content">
+  <div></div>
+<div></div>
     <button class="back-button" onclick="window.location.href='/server_info'">
       <i class="f7-icons">desktopcomputer</i>Server stats</button>
+      <button id="clearDataButton"><i class="f7-icons">arrow_counterclockwise_circle_fill</i>Clear All Data</button>
     <form action="/settings" method="post">
         <div class="settingsElement">
             <a class="title">MQTT Broker Settings</a>
@@ -60,6 +63,21 @@
         </div>
 
         <div class="settingsElement">
+        </div>
+    <div class="settingsElement">
+        <h2>Threshold Settings</h2>
+        <div class="inputBox">
+            <input type="number" name="temperature_threshold" placeholder="Temperature Threshold" class="input" value="{{ thresholds.get('Temperature', '') }}">
+            <span class="label">Temperature (°C)</span>
+        </div>
+        <div class="inputBox">
+            <input type="number" name="humidity_threshold" placeholder="Humidity Threshold" class="input" value="{{ thresholds.get('Humidity', '') }}">
+            <span class="label">Humidity (%)</span>
+        </div>
+        <div class="inputBox">
+            <input type="number" name="co2_threshold" placeholder="CO2 Threshold" class="input" value="{{ thresholds.get('CO2', '') }}">
+            <span class="label">CO2 (PPM)</span>
+        </div>
 
           <h2>Add new sensor</h2>
           <form method="POST">
@@ -144,6 +162,21 @@ function addTopic() {
         document.querySelector('.settingsElement').appendChild(newDiv);
     }
 }
+const clearDataButton = document.getElementById("clearDataButton");
+        clearDataButton.addEventListener("click", () => {
+            if (confirm("Are you sure you want to clear all data? This action cannot be undone.")) {
+                fetch("/clear_data", { method: "POST" })
+                    .then(response => {
+                        if (response.ok) {
+                            alert("Data cleared successfully!");
+                            location.reload(); 
+                        } else {
+                            alert("Error clearing data.");
+                        }
+                    });
+            }
+        });
+    </script>
   </script>
 </body>
 </html>

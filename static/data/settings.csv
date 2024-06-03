@@ -1,2 +1,7 @@
 mqtt_broker,192.168.31.94
 mqtt_port,1883
+sensor_name,value
+Temperature,40
+Humidity,90
+CO2,900
+temperature_threshold,40.0

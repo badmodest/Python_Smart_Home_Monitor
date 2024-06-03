@@ -15,18 +15,37 @@ import tkinter as tk
 import psutil
 import platform
 import socket 
+import os
+
 def read_settings():
+    settings = {'mqtt_broker': '192.168.31.94', 'mqtt_port': '1883'}
     try:
-        with open('static/data/settings.csv', mode='r', newline='') as csvfile:
+        with open('data/settings.csv', mode='r') as csvfile:
             reader = csv.reader(csvfile)
-            settings = {rows[0]: rows[1] for rows in reader}
-            return settings
+            for row in reader:
+                settings[row[0]] = row[1]
     except FileNotFoundError:
-        with open('static/data/settings.csv', mode='w', newline='') as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerow(['mqtt_broker', '127.0.0.1'])
-            writer.writerow(['mqtt_port', '1883'])
-        return {'mqtt_broker': '127.0.0.1', 'mqtt_port': '1883'}
+        pass
+    return settings
+
+def save_settings(settings):
+    with open('static/data/settings.csv', mode='w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        for key, value in settings.items():
+            writer.writerow([key, value])
+
+def load_thresholds():
+    thresholds = {}
+    try:
+        with open("static/data/settings.csv", "r") as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                if row["sensor_name"] in sensor_data:  
+                    thresholds[row["sensor_name"]] = row["value"]
+    except FileNotFoundError:
+        pass
+    return thresholds
+
 
 def run_flask_app(ip, port, log_field):
     log_handler = TextLogHandler(log_field)
@@ -119,14 +138,14 @@ def on_connect(client, userdata, flags, rc):
         mqtt_topic = f"topic/{sensor}"
         client.subscribe(mqtt_topic)
     client.subscribe(power_state_topic) 
-    client.publish(power_state_topic, " ") # Публикуем пустое сообщение, чтобы Tasmota отправила текущее состояние
+    client.publish(power_state_topic, " ")
 
 def on_message(client, userdata, msg):
     global data, last_update_time, current_state
 
     try:
         payload = msg.payload.decode()
-        print(f"Received message on topic '{msg.topic}': {payload}")  # Отладка
+        print(f"Received message on topic '{msg.topic}': {payload}") 
 
         if msg.topic == power_state_topic:
             current_state = json.loads(payload)["POWER"]
@@ -136,15 +155,13 @@ def on_message(client, userdata, msg):
             if sensor_name in sensor_data:
                 sensor_data[sensor_name]["value"] = float(payload)
 
-                # Добавляем данные в список (только значение сенсора)
                 data.append({
                     "timestamp": datetime.now(),
                     "sensor_name": sensor_name,
-                    "value": sensor_data[sensor_name]["value"]  # Записываем только значение
+                    "value": sensor_data[sensor_name]["value"]
                 })
 
-                # Записываем в CSV (только значение сенсора)
-                with open("static/data/dataa.csv", "a", newline="") as csvfile:  # Используем 'a' для добавления
+                with open("static/data/dataa.csv", "a", newline="") as csvfile:
                     writer = csv.writer(csvfile)
                     writer.writerow([datetime.now(), sensor_name, sensor_data[sensor_name]["value"]])
 
@@ -216,8 +233,23 @@ def register():
         username = request.form['username']
         password = request.form['password']
 
-        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
 
+        existing_users = {}
+        if os.path.exists(passwords_file):
+            with open(passwords_file, 'r') as file:
+                for line in file:
+                    user, _ = line.strip().split(':')
+                    existing_users[user] = True
+
+        if username in existing_users:
+            try:
+                with open("static/data/dataa.csv", "w") as f:
+                    f.write("timestamp,sensor_name,value\n") 
+                return redirect(url_for('login'))
+            except Exception as e:
+                return f"Error clearing data: {e}", 500
+
+        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
         with open(passwords_file, 'a') as file:
             file.write(f'{username}:{hashed_password}\n')
 
@@ -308,24 +340,8 @@ def sensor_graph(sensor_name):
     return render_template('sensor_graph.html', sensor_name=sensor_name )
 
 
-def read_settings():
-    settings = {'mqtt_broker': '192.168.31.94', 'mqtt_port': '1883'}
-    try:
-        with open('data/settings.csv', mode='r') as csvfile:
-            reader = csv.reader(csvfile)
-            for row in reader:
-                settings[row[0]] = row[1]
-    except FileNotFoundError:
-        pass 
 
-    return settings
-
-def save_settings(settings):
-    with open('static/data/settings.csv', mode='w', newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        for key, value in settings.items():
-            writer.writerow([key, value])
-
+'''
 @app.route("/settings", methods=['GET', 'POST'])
 def settings_route():
     if not session.get('logged_in'):
@@ -338,6 +354,7 @@ def settings_route():
         settings = read_settings()
         settings['mqtt_broker'] = mqtt_broker
         settings['mqtt_port'] = mqtt_port
+        
         save_settings(settings)
 
         return redirect(url_for('index'))
@@ -346,7 +363,71 @@ def settings_route():
         topic_settings = read_topic_settings()
         return render_template("settings.html", mqtt_broker=mqtt_settings['mqtt_broker'],
                                mqtt_port=mqtt_settings['mqtt_port'], topic_settings=topic_settings, sensor_data=sensor_data)
+        '''
+        
+@app.route("/settings", methods=['GET', 'POST'])
+def settings_route():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
 
+    settings = read_settings("static/data/settings.csv")
+
+    if request.method == 'POST':
+        for key in request.form:
+            if key in ['mqtt_broker', 'mqtt_port']:
+                settings[key] = request.form[key]
+            elif key.endswith("_threshold"):
+                sensor_name = key.replace("_threshold", "")
+                try:
+                    settings[key] = float(request.form[key])  
+                except ValueError: 
+                    flash(f"Invalid threshold value for {sensor_name}. Please enter a number.")
+            elif key.startswith("topic_"):
+                topic_name = key[len("topic_"):]
+                settings[key] = request.form[key]
+
+        try:
+            save_settings(settings, "static/data/settings.csv")
+            flash("Settings saved successfully!")
+        except Exception as e:
+            flash(f"Error saving settings: {e}")
+            logging.error(f"Error saving settings: {e}")
+
+        return redirect(url_for('index'))
+
+    return render_template("settings.html",
+                           mqtt_broker=settings.get('mqtt_broker', ''),
+                           mqtt_port=settings.get('mqtt_port', ''),
+                           topic_settings=settings.get('topic_settings', {}),
+                           sensor_data=sensor_data,
+                           thresholds={k: v for k, v in settings.items() if k.endswith('_threshold')})
+
+def read_settings(filename="static/data/settings.csv"):
+    settings = {'mqtt_broker': '192.168.31.94', 'mqtt_port': '1883'} 
+    try:
+        with open(filename, mode='r') as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                settings[row[0]] = row[1]
+    except FileNotFoundError:
+        pass
+    return settings
+
+def save_settings(settings, filename="static/data/settings.csv"):
+    with open(filename, mode='w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        for key, value in settings.items():
+            writer.writerow([key, value])
+
+        
+@app.route('/clear_data', methods=['POST'])
+def clear_data():
+    try:
+        with open("static/data/dataa.csv", "w") as f:
+            f.write("timestamp,sensor_name,value\n")
+        return "Success", 200
+    except Exception as e:
+        return f"Error: {e}", 500
 def read_topic_settings():
     topic_settings = {}
     try:

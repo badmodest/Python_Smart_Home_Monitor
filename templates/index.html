@@ -284,20 +284,56 @@ window.addEventListener("click", (event) => {
       }
     }
     updateData();
-    setInterval(updateData, 5500);
+    setInterval(updateData, 1500);
 
-    function refreshSortable() {
-      const dragAndDropItems = document.getElementById('card');
-      if (dragAndDropItems.sortable) {
-        dragAndDropItems.sortable.destroy(); 
+
+    async function checkDataAndAlert() {
+      // Fetch 
+      const settingsResponse = await fetch("/static/data/settings.csv");
+      const settingsText = await settingsResponse.text();
+      const settingsData = Papa.parse(settingsText, { header: true }).data;
+  
+      // Extract 
+      const thresholds = {};
+      for (const row of settingsData) {
+          thresholds[row.sensor_name] = parseFloat(row.value);
       }
-    
-      new Sortable(dragAndDropItems, {
-        animation: 350,
-        chosenClass: 'team-member-chosen',
-        dragClass: 'team-member-drag'
-      });
-    }
+  
+      // Fetch 
+      const response = await fetch("/static/data/dataa.csv");
+      const text = await response.text();
+      const data = Papa.parse(text, { header: true }).data;
+  
+      const latestData = data.reduce((acc, row) => {
+          acc[row.sensor_name] = row.value;
+          return acc;
+      }, {});
+  
+      // Check  alerts
+      let alertMessage = "";
+      for (const sensor in thresholds) {
+          if (latestData[sensor] && parseFloat(latestData[sensor]) > thresholds[sensor]) {
+              alertMessage += `${sensor} is too high (${latestData[sensor]})\n`;
+          }
+      }
+      if (latestData.Temperature && parseFloat(latestData.Temperature) > temperatureThreshold) {
+          alertMessage += `Temperature is too high (${latestData.Temperature}°C)\n`;
+      }
+      if (latestData.Humidity && parseFloat(latestData.Humidity) > humidityThreshold) {
+          alertMessage += `Humidity is too high (${latestData.Humidity}%)\n`;
+      }
+      if (latestData.CO2 && parseFloat(latestData.CO2) > ppmThreshold) {
+          alertMessage += `CO2 level is too high (${latestData.CO2} PPM)\n`;
+      }
+  
+      if (alertMessage) {
+          alert(alertMessage);
+          // fetch("/clear_data", { method: "POST" })
+          //     .then(response => { /* ... */ });
+      }
+  }
+  checkDataAndAlert();
+  setInterval(checkDataAndAlert, 60000);
 </script>
 </body>
 </html>
