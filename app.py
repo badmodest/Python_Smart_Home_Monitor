@@ -321,7 +321,7 @@ def index():
             print("OFFFFFFFFFFFFF")
     temp = sensor_data['Temperature']['value']
     print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",temp)
-    return render_template("index.html", sensor_data=sensor_data, hello_username=hello_username, is_guest=is_guest, status=status, state=current_state, temp=temp)
+    return render_template("index.html", sensor_data=sensor_data, hello_username=hello_username, is_guest=is_guest, status=status, state=current_state, temp=20)
 
 @app.route("/overview")
 def overview():

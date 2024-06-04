@@ -42,31 +42,7 @@
     <h3 class="heading">Hey, {{ hello_username }} 👋 Yur device is <span id="status" data-status="{{ status }}">{{ status }}</span></h3>
     <hr class="rounded">
     
-    <div class="grid-container">
 
-
-      <div class="grid">
-        {% for sensor, data in sensor_data.items() %}
-          <div class="over-card temp-color "> <div class="card-header">
-              <h2>{{ sensor }}</h2>
-            </div>
-            <div class="card-body">
-              <div class="value-container">
-                <span class="value" id="{{ sensor }}Value">{{ data.value }}</span>
-                <span class="unit">{{ data.unit }}</span>
-              </div>
-              <div class="chart-container">
-                <canvas id="{{ sensor }}Canvas"></canvas> </div>
-            </div>
-          </div>
-        {% endfor %}
-      </div>
-      
-    
-
-
-
-    </div>
   </div>
 
 

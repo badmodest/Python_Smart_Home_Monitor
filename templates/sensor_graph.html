@@ -18,6 +18,8 @@
              Prev Sensor<i class="f7-icons">arrowtriangle_left_fill</i></button>
         <button class="next-button" onclick="goToNextSensor('{{ sensor_name }}')">
             <i class="f7-icons">arrowtriangle_right_fill</i>Next Sensor</button>
+        <button class="next-button" onclick="goToNextSensor('{{ sensor_name }}')">
+            <i class="f7-icons">grid</i>Export to table</button>    
     </div>
     <div class="over-card temp-color">
         <div class="card-header">
@@ -145,14 +147,14 @@
     getData('{{ sensor_name }}');
 
         function goToNextSensor(currentSensor) {
-            const sensorOrder = ["Temperature", "Humidity", "Pressure", "CO2","Inside","Outside","battery"];
+            const sensorOrder = ["Temperature", "Humidity", "Pressure", "CO2","Inside","Outside","Battery"];
             const currentIndex = sensorOrder.indexOf(currentSensor);
             const nextIndex = (currentIndex + 1) % sensorOrder.length;
             const nextSensor = sensorOrder[nextIndex];
             window.location.href = "/sensor_graph/" + nextSensor;
         }
         function goToPreviousSensor(currentSensor) {
-            const sensorOrder = ["Temperature", "Humidity", "Pressure", "CO2","Inside","Outside","battery"];
+            const sensorOrder = ["Temperature", "Humidity", "Pressure", "CO2","Inside","Outside","Battery"];
             const currentIndex = sensorOrder.indexOf(currentSensor);
             const prevIndex = (currentIndex - 1 + sensorOrder.length) % sensorOrder.length; 
             const prevSensor = sensorOrder[prevIndex];

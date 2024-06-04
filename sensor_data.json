@@ -1,7 +1,7 @@
 {
     "Temperature": {
         "value": 0,
-        "unit": "\u0412\u00b0C",
+        "unit": "°C",
         "icon": "sun_max"
     },
     "Humidity": {
@@ -21,17 +21,17 @@
     },
     "Inside": {
         "value": 0,
-        "unit": "Danon",
-        "icon": "burn"
+        "unit": "°C",
+        "icon": "house_fill"
     },
     "Outside": {
         "value": 0,
-        "unit": "V",
+        "unit": "°C",
         "icon": "bolt_horizontal_fill"
     },
-    "battery": {
+    "Battery": {
         "value": 0,
         "unit": "%",
-        "icon": "battery_25"
+        "icon": "battery_100"
     }
 }
