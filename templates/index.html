@@ -113,12 +113,29 @@
         <h2 class="some-color">State: {{ state }}</h2>
         <h3 class="some-color">Smart rozetka</h3>
       </div>
+
       <div class="big-card">
         <div class="slider-container">
           <label for="switch">Toggle: On/Off</label>
           <input type="checkbox" id="switch" class="switch" onchange="toggleSwitch(this)" {% if current_state == "ON" %}checked{% endif %}> 
       </div>
-      
+    </div>
+    
+  </div>
+  <div class="grid">
+    <div class="big-card somer-color">
+      <h2 class="somer-color">Set prefered temperature</h2>
+      <div class="seekbar-container">
+        <input type="range" min="0" max="100" value="100" class="seekbar" id="{{ sensor_name }}Seekbar">
+        <div class="seekbar-value" id="{{ sensor }}SeekbarValue"></div> </div>
+    </div>
+    <div class="big-card">
+      <div class="slider-container">
+        <label for="switch">Toggle: On/Off</label>
+        <input type="checkbox" id="switch" class="switch" onchange="toggleSwitch(this)" {% if current_state == "ON" %}checked{% endif %}> 
+    </div>
+  </div>
+</div>
       <script>
       const checkbox = document.getElementById("switch");
       
@@ -173,73 +190,25 @@ function toggleSwitch(checkbox) {
   </div>
 
   <script>
-    /*
-    const card = document.querySelector(".card");
-const popup = document.getElementById("popup");
-
-card.addEventListener("click", () => {
-  console.log("Включена всплывашка");
-  popup.classList.add("visible");
-});
-
-
-window.addEventListener("click", (event) => {
-  if (event.target !== card && !event.target.closest("#popup")) {
-    popup.classList.remove("visible");
-  }
-});
-
-
-
-
-
-
-
-    const checkbox = document.querySelector("#switch");
-
-    checkbox.addEventListener("change", () => {
-      if (checkbox.checked) {
-        console.log("Включена темная тема");
-        document.body.classList.add("dark-theme");
-        // 
-      } else {
-        console.log("Включена светлая тема");
-        document.body.classList.remove("dark-theme");
-        // 
-      }
-    });
-
-
-    */ 
-
-
     function updateDateTime() {
       const monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
       const dayElement = document.querySelector(".day");
       const dateElement = document.querySelector(".date");
       const monthElement = document.querySelector(".month");
       const timeElement = document.querySelector(".time");
-    
-
       const now = new Date();   
-    
       const yea = { year: "numeric", };
       const mo =  { month: "long",};
       const da =  { day: "numeric",};
       const ti =  { hour: "numeric",
                     minute: "numeric",};
-    
-    
       dayElement.textContent = now.toLocaleDateString("en-US", da);
       dateElement.textContent = now.toLocaleDateString("en-US", yea);
       monthElement.textContent = now.toLocaleDateString("en-US", mo);
       timeElement.textContent = now.toLocaleTimeString("en-US", ti);
     }
-    
     updateDateTime();
     setInterval(updateDateTime, 1000); 
-
-
 
     var status = document.getElementById("status").getAttribute("data-status");
     console.log("Уведомление было кликнуто.");
@@ -334,6 +303,23 @@ window.addEventListener("click", (event) => {
   }
   checkDataAndAlert();
   setInterval(checkDataAndAlert, 60000);
+
+  const seekbar = document.getElementById("{{ sensor }}Seekbar");
+const seekbarValue = document.getElementById("{{ sensor }}SeekbarValue");
+
+seekbar.addEventListener('input', function() {
+    // код для назначения текущей этой ну той ...
+
+    const value = this.value;
+    seekbarValue.textContent = value;
+
+    const percent = (value / this.max) * 100;
+    const seekbarRect = seekbar.getBoundingClientRect();
+    const offset = (percent / 100) * seekbarRect.width - seekbarValue.offsetWidth / 2;
+    seekbarValue.style.left = `${offset}px`;
+});
+
+
 </script>
 </body>
 </html>
