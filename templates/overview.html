@@ -100,11 +100,10 @@
       for (const [sensor, sensorData] of Object.entries(graphData)) {
           const ctx = document.getElementById(`${sensor}Canvas`).getContext("2d");
           var gradient = ctx.createLinearGradient(0, 0, 0, 400);
-          gradient.addColorStop(0, 'rgba(245,68,54,1)');
-          gradient.addColorStop(0.3, 'rgba(245,68,54,0)');   
-          gradient.addColorStop(1, 'rgba(245,68,54,0)');
+          gradient.addColorStop(0, 'rgba(64, 138, 251,1)');
+          gradient.addColorStop(0.3, 'rgba(121, 169, 243,0)');   
+          gradient.addColorStop(1, 'rgba(121, 169, 243,0)');
           
-          // Slice to get the last 20 data points
           const last20Timestamps = sensorData.timestamps.slice(-visiblePoints);
           const last20Values = sensorData.values.slice(-visiblePoints);
   
@@ -112,7 +111,7 @@
               label: sensor, 
               fill: true,
               data: last20Values.map((value, index) => ({ x: last20Timestamps[index].getTime(), y: value })), // Convert to timestamp
-              borderColor: "#f54436",
+              borderColor: "#286FDA",
               backgroundColor: gradient,
               borderWidth: 2,
               pointRadius: 0,
@@ -144,13 +143,13 @@
                   },
                   scales: {
                       x: {
-                          type: 'linear', // Use a linear scale for timestamps
+                          type: 'linear',
                           ticks: {
                               callback: function(value, index, values) {
                                   return new Date(value).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); 
                               },
                               autoSkip: true,
-                              maxTicksLimit: 10, // You can adjust the number of ticks as needed
+                              maxTicksLimit: 10,
                           },
                           title: {
                               display: false,

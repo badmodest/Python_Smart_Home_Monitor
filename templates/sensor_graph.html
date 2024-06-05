@@ -11,6 +11,7 @@
 
 </head>
 <body>
+    <div class="side-menu">
     <div class="button-container">
         <button class="back-button" onclick="window.location.href='/'">
             <i class="f7-icons">arrowtriangle_up_fill</i>Back to Home</button>
@@ -21,11 +22,15 @@
         <button class="next-button" onclick="goToNextSensor('{{ sensor_name }}')">
             <i class="f7-icons">grid</i>Export to table</button>    
     </div>
+</div>
+<div class="content">
     <div class="over-card temp-color">
         <div class="card-header">
             <h2>{{ sensor_name }}</h2>
             
-            <div id="averageValue"></div>
+            <div id="averageValue" class="smol"></div>
+            <div id="minValue"  class="smol"></div>
+            <div id="maxValue"  class="smol"></div>
         </div>
         <div class="card-body">
             <div class="chart-container">
@@ -40,6 +45,10 @@
             <input class="input" type="number" id="visiblePointsInput" min="1" value="20">
         </div>
     </div>
+</div>
+
+
+
 
     <script>
         async function getData(sensorName) {
@@ -66,11 +75,17 @@
             let visiblePoints = 20;
             const ctx = document.getElementById(`${sensorName}Canvas`).getContext("2d");
             const averageValueElement = document.getElementById("averageValue");
+            const maxValueElement = document.getElementById("maxValue");
+            const minValueElement = document.getElementById("minValue");
             function createChart(startIndex) {
                 const endIndex = Math.min(startIndex + visiblePoints, datasets[0].data.length);
                 const visibleValues = datasets[0].data.slice(startIndex, endIndex).map(d => d.y);
                 const average = visibleValues.reduce((sum, value) => sum + value, 0) / visibleValues.length;
                 averageValueElement.textContent = `Average: ${average.toFixed(2)}`; 
+                const max = visibleValues.reduce((maxVal, currentVal) => currentVal > maxVal ? currentVal : maxVal, -Infinity); 
+                maxValueElement.textContent = `Maximum: ${max.toFixed(2)}`;
+                const min = visibleValues.reduce((minVal, currentVal) => currentVal < minVal ? currentVal : minVal, Infinity);
+                minValueElement.textContent = `Minimum: ${min.toFixed(2)}`;
                 const chart = new Chart(ctx, {
                     type: "line",
                     data: {

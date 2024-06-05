@@ -1,36 +1,37 @@
 {
-    "Temperature": {
+    "Temp_Inside": {
         "value": 0,
         "unit": "°C",
-        "icon": "sun_max"
+        "icon": "thermometer"
     },
-    "Humidity": {
+    "Temp Outside": {
         "value": 0,
-        "unit": "%",
-        "icon": "drop"
+        "unit": "°C",
+        "icon": "thermometer_sun"
     },
     "Pressure": {
         "value": 0,
         "unit": "hPa",
         "icon": "chevron_up_chevron_down"
     },
+    "Humidity_Inside": {
+        "value": 0,
+        "unit": "%",
+        "icon": "drop"
+    },
+    "Humidity Outside": {
+        "value": 0,
+        "unit": "%",
+        "icon": "drop_fill"
+    },
+
     "CO2": {
         "value": 0,
         "unit": "PPM",
-        "icon": "wind"
-    },
-    "Inside": {
-        "value": 0,
-        "unit": "°C",
-        "icon": "house_fill"
-    },
-    "Outside": {
-        "value": 0,
-        "unit": "°C",
-        "icon": "bolt_horizontal_fill"
+        "icon": "heart_fill"
     },
     "Battery": {
-        "value": 0,
+        "value": 100,
         "unit": "%",
         "icon": "battery_100"
     }

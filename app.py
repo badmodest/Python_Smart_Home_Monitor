@@ -81,7 +81,7 @@ power_command_topic = "cmnd/topic/POWER"
 current_state = "Unknown" 
 hello_username = ""
 status = "Offline"
-last_update_time = datetime.now()
+
 
 def load_sensor_data(filename="sensor_data.json"):
 
@@ -145,6 +145,7 @@ def on_message(client, userdata, msg):
 
     try:
         payload = msg.payload.decode()
+        last_update_time = datetime.now()
         print(f"Received message on topic '{msg.topic}': {payload}") 
 
         if msg.topic == power_state_topic:
@@ -172,7 +173,7 @@ client = mqtt.Client(client_id="iMAC")
 client.on_connect = on_connect
 client.on_message = on_message
 if on_message:
-    print('NUBLAAA')
+    print('Connected')
 client.connect(mqtt_broker, mqtt_port, 60)
 print(mqtt_broker,mqtt_port)
 
@@ -219,7 +220,6 @@ client = mqtt.Client(client_id="iMAC")
 client.on_message = on_connect
 client.on_message = on_message
 if on_message:
-    print('NUBLAAA')
 #client.connect(mqtt_broker, mqtt_port, 60)
 client.connect("localhost", 1883, 60)
 print(mqtt_broker,mqtt_port)
@@ -297,11 +297,9 @@ def index():
     global status, last_update_time, current_state
     time_difference = datetime.now() - last_update_time
     if time_difference.total_seconds() > 10:
-        status = "Offline"
-        print("like")
+        status = "Offline (data may be outdated)"
     else:
         status = "Online"
-        print("dislike")
 
     hello_username = session.get('hello_username', 'Guest')
     is_guest = (hello_username == 'Guest')
@@ -319,9 +317,9 @@ def index():
         elif switch_state == "off":
             client.publish(power_command_topic, "OFF")
             print("OFFFFFFFFFFFFF")
-    temp = sensor_data['Temperature']['value']
-    print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",temp)
-    return render_template("index.html", sensor_data=sensor_data, hello_username=hello_username, is_guest=is_guest, status=status, state=current_state, temp=20)
+    temp = sensor_data['Temp Outside']['value']
+    print("TEMP IS",temp)
+    return render_template("index.html", sensor_data=sensor_data, hello_username=hello_username, is_guest=is_guest, status=status, state=current_state, temp=temp, last_value=22)
 
 @app.route("/overview")
 def overview():
@@ -449,7 +447,6 @@ def save_topic_settings(topic_settings):
 
 @app.route("/data")
 def get_data():
-    print("OTPRAVKA", data)
     return jsonify({**sensor_data, "current_state": current_state})
 
 

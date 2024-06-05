@@ -17,18 +17,20 @@
   --black:             #e5e5e5;
   --blum:              #bbb3cb;
   --blue:              #2F81F7;
-  --lavander:          #bbb3cb;
-  --d_lavander:        #463b63;
-  --pinky:             #cb9ca4;
-  --d_pinky:           #5e2327;
+  --lavander:          #ccc7d6;
+  --d_lavander:        #564f66;
+  --pinky:             #B7907F;
+  --d_pinky:           #493831;
   --cyan:              #9dcbc9;
   --d_cyan:            #146964;
-  --yellow:            #e4b975;
-  --d_yellow:          #66461d;
+  --yellow:            #e69677;
+  --d_yellow:          #643a29e7;
   --lake:              #b0bcbc;
   --d_lake:            #3a4646;
-  --green:             #bfcb9b;
-  --d_green:           #777e60;
+  --green:             #828bb0;
+  --d_green:           #323a5e;
+  --greeny:            #B9DC98;
+  --d_greeny:           #B9DC98 ;
 }
 
 .dark-theme {
@@ -213,7 +215,7 @@ p {
   grid-template-columns: 1fr;
   grid-gap: 10px;
   margin: 0 auto;
-  max-width: 900px;
+  max-width: 1140px;
 }
 
 .big-card {
@@ -334,7 +336,7 @@ i.f7-icons {
   margin-right: 3px;
 }
 .switch:checked {
-  background-color: var(--green);
+  background-color: var(--greeny);
   box-shadow: inset 35px 0 0 0 rgba(0, 0, 0, 0.2);
 }
 
@@ -358,33 +360,33 @@ i.f7-icons {
   margin: 10px 0;     
 }
 
-.seekbar::-webkit-slider-runnable-track { /* Добавляем стиль для трека (track) */
+.seekbar::-webkit-slider-runnable-track {
   width: 100%;
-  height: 16px;           /* Высота трека */
-  background: #f0f0f0;    /* Цвет трека */
+  height: 16px;          
+  background: #f0f0f0;  
   border-radius: 12px;
   cursor: pointer;
-  border: none;          /* Убираем границу у трека */
+  border: none;     
 }
 
 .seekbar::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 32px;          /* Увеличен размер ползунка */
-  height: 32px;         /* Увеличен размер ползунка */
-  background: var(--d_lavander); 
+  width: 32px;          
+  height: 32px;         
+  background: var(--d_pinky); 
   cursor: pointer;
   border-radius: 50%;
-  border: 4px solid #fff; /* Утолщаем белую границу */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Добавляем легкую тень */
-  margin-top: -8px;      /* Вертикальное выравнивание ползунка */
+  border: 4px solid #fff; 
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); 
+  margin-top: -8px;      
 }
 
 
 .seekbar-value {
   position: absolute;
   top: -30px; 
-  background-color: var(--d_lavander); 
+  background-color: var(--d_pinky); 
   color: white;
   padding: 5px 10px;
   border-radius: 5px;
@@ -544,8 +546,8 @@ i.f7-icons {
 
 }
 .card:last-child {
-  background-color: var(--green);
-  border: 1px solid var(--green);
+  background-color: #b3a9c893;
+  border: 1px solid #b3a9c893;
 }
 .icon-in-card {
   position: absolute;
@@ -833,27 +835,60 @@ color: var(--white)
     display: flex;
     flex-direction: row;
   }
+  .grid:not(:empty) > .card:last-child {
+    grid-column: span 1;
+}
 
+.gridd:not(:empty) > .card:last-child {
+  grid-column: span 1;
+}
+
+.grid {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+.grid-container {
+
+  max-width: 1140px;
+}
+.card:last-child {
+  grid-column: span 2;
+}
+.paddingg{
+  padding-bottom: 100px;
+}
   .menu-item {
     padding: 10px;
   }
-
+  i.f7-icons {
+    font-size: 1.2em;
+    margin-right: -5px;
+    margin-left: 165px;
+    margin-top: 10px;
+}
+.some-color {
+  color: var(--d_lavander);
+  background-color: var(--lavander);
+  grid-template-columns: repeat(auto-fit, minmax(20px, 23fr));
+  grid-column-start: 2;
+  min-height: 3.6rem;
+}
+.somer-color {
+  color: var(--d_lavander);
+  background-color: var(--lavander);
+  grid-template-columns: repeat(auto-fit, minmax(20px, 23fr));
+  grid-column-start: 2;
+  min-height: 3.6rem;
+}
   .content{
     border-radius: 0px;
     margin-block: 0px;
-  }
-  .grid{
-    grid-template-columns: repeat(auto-fit, minmax(69px, 1fr));
-
   }
   .card {
     padding: 10px;
     width: 48vw;
     height: 13vh;
   }
-  .menu-item:hover::before,.menu-item:hover,.menu-iteem-active::before,.menu-item-active::before,.card:hover,.card:active{
-    display: none;
-  }
+
 }
 /* Small devices (portrait tablets and large phones, 600px and up) */
 @media only screen and (min-width: 600px) {
@@ -868,7 +903,6 @@ color: var(--white)
   .bottom-menu {
     display: none;
   }
-
 
   .card {
     padding: 15px;
@@ -933,17 +967,6 @@ color: var(--white)
 }
 
 
-.chart-container canvas {
-  
-  width: 100%;
-  height: 100%;
-  border-radius: 20px;
-  margin-left: -8px;
-  margin-bottom: -8px;
-  z-index: 4;
-  max-height: 145px;
-  
-}
 
 .index{
   z-index: 5;
@@ -956,13 +979,13 @@ grid-column-start: 1;
   
 }
 .chart-container {
+  font-weight: 250;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
   border-radius: 20px;
   z-index: 1;
-  
   
 
 }
@@ -973,6 +996,20 @@ grid-column-start: 1;
   position: relative;
   margin-top: 100px;
 }
+
+
+canvas {
+  
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  margin-left: -24px;
+  margin-bottom: -14px;
+  z-index: 4;
+  max-height: 145px;
+  
+}
+
 .value-container,.card-header{
   padding: 0% 2% 0% 6%;
 }

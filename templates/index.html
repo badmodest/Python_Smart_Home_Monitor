@@ -19,7 +19,14 @@
     <a href="#" class="menu-item"><i class="fas fa-home fa-2x"></i></a>
     <a href="/overview" class="menu-item"><i class="fas fa-chart-bar fa-2x"></i></a>
     <a href="/charts" class="menu-item"><i class="fas fa-tachometer-alt fa-2x"></i></a>
-    <a href="/login" action="/login" class="menu-item"><i class="fas fa-sign-out-alt fa-2x"></i></a>
+    {% if not is_guest %}
+    <a href="/settings" class="menu-item"><i class="fas fa-gear fa-2x"></i></a>
+    {% endif %}
+    {% if hello_username == 'Guest' %}
+      <a href="/login" action="/login" class="menu-item"><i class="fas fa-sign-in-alt fa-2x"></i></a>
+    {% else %}
+      <a href="/logout" class="menu-item"><i class="fas fa-sign-out-alt fa-2x"></i></a>
+    {% endif %}
   </div>
 
   <div class="side-menu">
@@ -118,11 +125,11 @@
     </div>
     
   </div>
-  <div class="grid">
+  <div class="grid paddingg">
     <div class="big-card somer-color">
       <h2 class="somer-color">Set prefered temperature</h2>
       <div class="seekbar-container">
-        <input type="range" min="0" max="100" value="100" class="seekbar" id="{{ sensor_name }}Seekbar">
+        <input type="range" min="0" max="100" value="{{ last_value }}" class="seekbar" id="{{ sensor_name }}Seekbar">
         <div class="seekbar-value" id="{{ sensor }}SeekbarValue"></div> </div>
     </div>
     <div class="big-card">
@@ -131,6 +138,8 @@
         <input type="checkbox" id="switch" class="switch" onchange="toggleSwitch(this)" {% if current_state == "ON" %}checked{% endif %}> 
     </div>
   </div>
+</div>
+</div>
 </div>
       <script>
       const checkbox = document.getElementById("switch");
