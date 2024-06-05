@@ -1,0 +1,85 @@
+import tkinter as tk
+from tkinter import messagebox
+import subprocess
+import os
+import logging
+import app
+def start_app():
+    ip_address = ip_entry.get()
+    port = port_entry.get()
+
+    if not ip_address:
+        messagebox.showerror("Ошибка", "Введите IP-адрес")
+        return
+
+    if not port:
+        messagebox.showerror("Ошибка", "Введите порт")
+        return
+
+    new_args = [
+        "C:/Users/black/AppData/Local/Microsoft/WindowsApps/python3.12.exe",
+        "app.py",
+        "--ip", ip_address,
+        "--port", port,
+    ]
+
+     # Создать обработчик логов
+    log_handler = TextLogHandler(text_field)  # Меняйте 'text_field' на имя нужного объекта
+
+    # Получить логгер app.py
+    logger = logging.getLogger("app") 
+
+    # Добавить обработчик логов
+    logger.addHandler(log_handler)
+
+    # Запустить app.py
+    print("Args:", new_args)
+    print("Current working directory:", os.getcwd())
+    subprocess.Popen(new_args)
+
+
+
+
+class TextLogHandler(logging.Handler):
+    def __init__(self, text_field):
+        super().__init__()
+        if not isinstance(text_field, tk.Text):
+            raise ValueError("text_field must be a tkinter Text object")
+        self.text_field = text_field
+
+    def emit(self, record):
+        log_entry = f"{record.levelname}: {record.message}" 
+        self.text_field.insert("end", log_entry + "\n")
+        self.text_field.see("end")  # Прокрутка до конца
+        print(f"Log record: {record.levelname}: {record.message}")
+
+window = tk.Tk()
+window.title("Настройка приложения")
+
+ip_label = tk.Label(text="IP-адрес:")
+ip_entry = tk.Entry()
+
+port_label = tk.Label(text="Порт:")
+port_entry = tk.Entry()
+
+global text_field
+
+label = tk.Label(text="Логи приложения:")
+text_field = tk.Text(height=20, width=50)
+
+label.pack()
+text_field.pack()
+
+
+
+start_button = tk.Button(text="Запуск", command=start_app)
+
+ip_label.pack()
+ip_entry.pack()
+
+port_label.pack()
+port_entry.pack()
+
+start_button.pack()
+
+window.mainloop()

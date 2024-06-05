@@ -1,0 +1,4 @@
+mqtt_broker,192.168.31.94
+mqtt_port,1883
+mqtt_user,akame
+mqtt_passwd,1901

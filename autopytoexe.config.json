@@ -1,0 +1,7 @@
+{
+    "bundle_files": true,
+    "icon": "static/favicon.ico",
+    "includes": ["run.py", "app.py" , "static", "templates", "bin"],
+    "python_version": "3.12",
+    "target_dir": "dist"
+  }

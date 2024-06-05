@@ -218,7 +218,7 @@ body {
   /* Extra small devices (phones, 600px and down) */
 @media only screen and (max-width: 600px) {
     .card {
-        height: 10vh;
+        height: 60%;
         width: 100vw;
         gap: 55px;
         background: opacity;

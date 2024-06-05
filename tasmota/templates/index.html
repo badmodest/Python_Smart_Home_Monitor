@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Управление реле Tasmota</title>
+</head>
+<body>
+    <h1>Текущее состояние: {{ state }}</h1>
+    <form method="POST">
+        <button type="submit" name="action" value="on">ВКЛ</button>
+        <button type="submit" name="action" value="off">ВЫКЛ</button>
+    </form>
+</body>
+</html>

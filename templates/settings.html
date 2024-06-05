@@ -8,7 +8,10 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.css">
   <script src="https://kit.fontawesome.com/7e84202197.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <title>Smart Home Monitor</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/framework7-icons/css/framework7-icons.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/styles.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.css">
+  <title>Settings</title>
 </head>
 <body>
   <div class="bottom-menu">
@@ -24,7 +27,7 @@
     <a href="/overview" class="menu-item"><i class="fas fa-chart-bar fa-lg"></i>Addit</a>
     <a href="/charts" class="menu-item"><i class="fas fa-tachometer-alt fa-lg"></i>Dash</a>
     {% if not is_guest %}
-    <a href="#" class="menu-item menu-item-active"><i class="fas fa-gear fa-lg"></i>Settings</a>
+    <a href="#" class="menu-item menu-item-active"><i ></i>Prefs</a>
     {% endif %}
     {% if hello_username == 'Guest' %}
       <a href="/login" action="/login" class="menu-item"><i class="fas fa-sign-in-alt fa-lg"></i>Log In</a>
@@ -33,6 +36,11 @@
     {% endif %}
   </div>
   <div class="content">
+  <div></div>
+<div></div>
+    <button class="back-button" onclick="window.location.href='/server_info'">
+      <i class="f7-icons">desktopcomputer</i>Server stats</button>
+      <button id="clearDataButton"><i class="f7-icons">arrow_counterclockwise_circle_fill</i>Clear All Data</button>
     <form action="/settings" method="post">
         <div class="settingsElement">
             <a class="title">MQTT Broker Settings</a>
@@ -44,57 +52,131 @@
                 <input type="text" name="mqtt_port" placeholder="1883" class="input" value="{{ mqtt_port }}">
                 <span class="label">MQTT Port</span>
             </div>
+            <div class="inputBox">
+              <input type="text" name="mqtt_username" placeholder="user" class="input" value="{{ mqtt_user }}">
+              <span class="label">MQTT Username</span>
+          </div>
+          <div class="inputBox">
+            <input type="password" name="mqtt_passwd" placeholder="password" class="input" value="{{ mqtt_passwd }}">
+            <span class="label">MQTT Password</span>
+        </div>
         </div>
 
         <div class="settingsElement">
-            <a class="title">Topic Settings</a>
-            {% for topic, details in topic_settings.items() %}
-                <div class="inputBox">
-                    <input type="text" name="topic_{{ topic }}_value" placeholder="Value" class="input" value="{{ details['value'] }}">
-                    <input type="text" name="topic_{{ topic }}_unit" placeholder="Unit" class="input" value="{{ details['unit'] }}">
-                    <input type="text" name="topic_{{ topic }}_icon" placeholder="Icon" class="input" value="{{ details['icon'] }}">
-                    <span class="label">{{ topic }}</span>
-                </div>
-            {% endfor %}
-            <div>
-                <button type="button" onclick="addTopic()">Add Topic</button>
-            </div>
+        </div>
+    <div class="settingsElement">
+        <h2>Threshold Settings</h2>
+        <div class="inputBox">
+            <input type="number" name="temperature_threshold" placeholder="Temperature Threshold" class="input" value="{{ thresholds.get('Temperature', '') }}">
+            <span class="label">Temperature (°C)</span>
+        </div>
+        <div class="inputBox">
+            <input type="number" name="humidity_threshold" placeholder="Humidity Threshold" class="input" value="{{ thresholds.get('Humidity', '') }}">
+            <span class="label">Humidity (%)</span>
+        </div>
+        <div class="inputBox">
+            <input type="number" name="co2_threshold" placeholder="CO2 Threshold" class="input" value="{{ thresholds.get('CO2', '') }}">
+            <span class="label">CO2 (PPM)</span>
         </div>
 
-        <div>
-            <button type="submit" class="save" onclick="this.className='saved'">Save</button>
-        </div>
-    </form>
+          <h2>Add new sensor</h2>
+          <form method="POST">
+            <input type="text" name="new_key" id="new_key" placeholder="New sensor name" oninput="updatePreview()"class="input">
+            <button type="submit" name="add">Add Sensor</button>
+        </form>
+        
+        <form method="POST">
+            <select name="del_key" class="input">
+                {% for key in sensor_data.keys() %}
+                    <option value="{{ key }}">{{ key }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" name="delete">Delete Sensor</button>
+
+
+
+
+
+
+          <h2>Added sensors</h2>
+
+          <form method="POST">
+              <table>
+                  {% for key, value in sensor_data.items() %}
+                      <tr>
+                          <td>{{ key }}:</td>
+                          <td><input type="number" name="{{ key }}_value" value="{{ value['value'] }}"class="inputt"style="display: none;"></td>
+                          <td><input type="text" name="{{ key }}_unit" value="{{ value['unit'] }}"class="inputt"></td>
+                          <td><input type="text" name="{{ key }}_icon" value="{{ value['icon'] }}"class="inputt"></td>
+                      </tr>
+                  {% endfor %}
+                  <tr>
+                      <td><input type="text" id="new_key" name="new_key" placeholder="New sensor name" oninput="updatePreview()"class="inputt"></td>
+                      <td><input type="number" id="new_value" placeholder="Value" oninput="updatePreview()"class="inputt"style="display: none;"></td>
+                      <td><input type="text" id="new_unit" placeholder="Unit" oninput="updatePreview()"class="inputt"></td>
+                      <td><input type="text" id="new_icon" placeholder="Icon" oninput="updatePreview()"class="inputt"></td>
+                  </tr>
+              </table>
+              <button type="submit">Submit new sensors</button>
+          </form>
+          
+          <h2>Preview of New Card:</h2>
+          <div class="grid" style="margin-right:90%;">
+              <div class="card">
+                  <i class="f7-icons icon-in-card" id="previewIcon"></i> 
+                  <h3 class="text" id="previewSensorName"></h3>
+                  <p class="text">
+                      Value: <span id="previewValue"></span> <span id="previewUnit"></span>
+                  </p>
+              </div>
+          </div>
+      </body>
+      
+
+
 </div>
 
 <script>
-    function addTopic() {
-        const newTopic = prompt("Enter the new topic name:");
-        if (newTopic) {
-            const newDiv = document.createElement("div");
-            newDiv.className = "inputBox";
-            newDiv.innerHTML = `
-                <input type="text" name="topic_${newTopic}_value" placeholder="Value" class="input">
-                <input type="text" name="topic_${newTopic}_unit" placeholder="Unit" class="input">
-                <input type="text" name="topic_${newTopic}_icon" placeholder="Icon" class="input">
-                <span class="label">${newTopic}</span>`;
-            document.querySelector('.settingsElement').appendChild(newDiv);
-        }
+
+function updatePreview() {
+  var newSensorName = document.getElementById("new_key").value;
+  var newValue = document.getElementById("new_value").value;
+  var newUnit = document.getElementById("new_unit").value;
+  var newIcon = document.getElementById("new_icon").value;
+
+  document.getElementById("previewSensorName").textContent = newSensorName;
+  document.getElementById("previewValue").textContent = newValue;
+  document.getElementById("previewUnit").textContent = newUnit;
+  document.getElementById("previewIcon").textContent = newIcon; 
+}
+function addTopic() {
+    const newTopic = prompt("Enter the new topic name:");
+    if (newTopic) {
+        const newDiv = document.createElement("div");
+        newDiv.className = "inputBox";
+        newDiv.innerHTML = `
+            <input type="text" name="topic_${newTopic}_value" placeholder="Value" class="input">
+            <input type="text" name="topic_${newTopic}_unit" placeholder="Unit" class="input">
+            <input type="text" name="topic_${newTopic}_icon" placeholder="Icon" class="input">
+            <span class="label">${newTopic}</span>`;
+        document.querySelector('.settingsElement').appendChild(newDiv);
     }
-    function switchTheme(theme) {
-        fetch(`/switch-theme/${theme}`)
-          .then(response => response.json())
-          .then(data => {
-            localStorage.setItem('theme', theme);
-          });
-      }
-      function setSavedTheme() {
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-          switchTheme(savedTheme);
-        }
-      }
-      document.addEventListener('DOMContentLoaded', setSavedTheme);
+}
+const clearDataButton = document.getElementById("clearDataButton");
+        clearDataButton.addEventListener("click", () => {
+            if (confirm("Are you sure you want to clear all data? This action cannot be undone.")) {
+                fetch("/clear_data", { method: "POST" })
+                    .then(response => {
+                        if (response.ok) {
+                            alert("Data cleared successfully!");
+                            location.reload(); 
+                        } else {
+                            alert("Error clearing data.");
+                        }
+                    });
+            }
+        });
+    </script>
   </script>
 </body>
 </html>
