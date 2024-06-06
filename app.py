@@ -459,14 +459,6 @@ def get_data():
 def page_not_found(e):
     return render_template('404.html'), 404
 
-@app.route('/get_notification', methods=['GET'])
-def get_notification():
-    i_value = randint(28, 32)
-    if i_value > 30:
-        print("AAAHAAAAAUUUU")
-        return jsonify({'message': 'Значение I больше 30!'})
-    else:
-        return jsonify({'message': ''})
 
 @app.route('/server_info')
 def server_info():

@@ -290,8 +290,8 @@ function toggleSwitch(checkbox) {
               alertMessage += `${sensor} is too high (${latestData[sensor]})\n`;
           }
       }
-      if (latestData.Temperature && parseFloat(latestData.Temperature) > temperatureThreshold) {
-          alertMessage += `Temperature is too high (${latestData.Temperature}°C)\n`;
+      if (latestData.Temp_Inside && parseFloat(latestData.Temp_Inside) > 40) {
+          alertMessage += `Temperature is too high (${latestData.Temp_Inside}°C)\n`;
       }
       if (latestData.Humidity && parseFloat(latestData.Humidity) > humidityThreshold) {
           alertMessage += `Humidity is too high (${latestData.Humidity}%)\n`;
