@@ -98,6 +98,24 @@ body {
   justify-content: space-between;
   padding: 2% 2% 2% 1.3%;
 }
+.heading {
+  position: sticky;
+  top: 10px;
+  height: 5%;
+  margin-top: 10px;
+  padding: 10px;
+  padding-top: 30px;
+  background-color: #ffffff;
+  z-index: 10; 
+backdrop-filter: blur(10px);
+-webkit-backdrop-filter: blur(10px);
+background: rgba(225, 225, 225, 0.05);
+
+mask-image: linear-gradient(rgb(0, 0, 0) 50%, rgba(0, 0, 0, 0.8) 70%, rgba(0, 0, 0, 0) 100%);
+-webkit-mask-image: linear-gradient(rgb(0, 0, 0) 50%, rgba(0, 0, 0, 0.8) 70%, rgba(0, 0, 0, 0) 100%);
+inset: -1rem 0;
+
+}
 
 .menu-header {
   color: var(--white);
@@ -764,26 +782,6 @@ color: var(--white)
 
 
 
-
-
-.backdrop {
-  width: 100%;
-  height: 10%;
-  position: absolute;
-  z-index: 0;
-  top: 0;
-  opacity: 1;
-  
-  backdrop-filter: blur(30px);
-  -webkit-backdrop-filter: blur(30px);
-  
-  background: rgba(225, 225, 225, 0.05);
-  
-  mask-image: linear-gradient(rgb(0, 0, 0) 50%, rgba(0, 0, 0, 0.8) 70%, rgba(0, 0, 0, 0) 100%);
-  
-  -webkit-mask-image: linear-gradient(rgb(0, 0, 0) 50%, rgba(0, 0, 0, 0.8) 70%, rgba(0, 0, 0, 0) 100%);
-  inset: -1rem 0;
-}
 
 
 

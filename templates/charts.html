@@ -1,166 +1,158 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='/favicon.ico') }}">
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/styles.css') }}">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.css">
-  <title>Charts</title>
-  <link rel="data" href="{{ url_for('static', filename='data/dataa.csv') }}">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/framework7-icons/css/framework7-icons.css">
-  <script src="https://kit.fontawesome.com/7e84202197.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.1/papaparse.min.js"></script>
+    <title>{{ sensor_name }} Graph</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/framework7-icons/css/framework7-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/graph_styles.css') }}">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='/favicon.ico') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+
 </head>
 <body>
-  <div class="bottom-menu">
-    <a href="/" class="menu-item"><i class="fas fa-home fa-2x"></i></a>
-    <a href="/overview" class="menu-item"><i class="fas fa-chart-bar fa-2x"></i></a>
-    <a href="#" class="menu-item menu-item-active"><i class="fas fa-tachometer-alt fa-2x"></i></a>
-    <a href="/login" action="/login" class="menu-item"><i class="fas fa-sign-out-alt fa-2x"></i></a>
-  </div>
-  <div class="side-menu">
-    <div class="menu-header">Smart Home</div>
-    <a href="/" class="menu-item"><i class="fas fa-home fa-lg"></i>Home</a>
-    <a href="/overview" class="menu-item"><i class="fas fa-chart-bar fa-lg"></i>Addit</a>
-    <a href="#" class="menu-item menu-item-active"><i ></i>Dash</a>
-    {% if not is_guest %}
-    <a href="/settings" class="menu-item"><i class="fas fa-gear fa-lg"></i>Prefs</a>
-    {% endif %}
-    {% if hello_username == 'Guest' %}
-      <a href="/login" action="/login" class="menu-item"><i class="fas fa-sign-in-alt fa-lg"></i>Log In</a>
-    {% else %}
-      <a href="/logout" class="menu-item"><i class="fas fa-sign-out-alt fa-lg"></i>Log Out</a>
-    {% endif %}
-  </div>
-
-
-
-  <div class="content">
-    <h3 class="heading">Hey, {{ hello_username }} 👋 Yur device is <span id="status" data-status="{{ status }}">{{ status }}</span></h3>
-    <hr class="rounded">
+    <div class="side-menu">
+    <div class="button-container">
+        <button class="back-button" onclick="window.location.href='/'">
+            <i class="f7-icons">arrowtriangle_up_fill</i>Back to Home</button>
+        <button class="next-button" onclick="goToNextSensor('{{ sensor_name }}')">
+            <i class="f7-icons">grid</i>Export to table</button>    
+    </div>
+</div>
+<div class="content">
+    {% for sensor_name in sensor_names %}
+    <div class="over-card temp-color">
+        <div class="card-header">
+            <h2>{{ sensor_name }}</h2>
     
+            <div id="averageValue-{{ sensor_name }}" class="smol"></div>
+            <div id="minValue-{{ sensor_name }}"  class="smol"></div>
+            <div id="maxValue-{{ sensor_name }}"  class="smol"></div> 
+        </div>
+        <div class="card-body">  
+            <div class="chart-container">
+                <canvas id="{{ sensor_name }}Canvas"></canvas>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
 
-  </div>
 
 
-  <script>
-    async function getData() {
-      const response = await fetch("/static/data/dataa.csv");
-      const text = await response.text();
-      const data = Papa.parse(text, { header: true }).data;
-    
-      const graphData = {};
-      for (const row of data) {
-        const sensorName = row.sensor_name;
-        if (!graphData[sensorName]) {
-          graphData[sensorName] = {
-            timestamps: [],
-            values: []
-          };
+
+    <script>
+        async function getDataForAllSensors() {
+            const response = await fetch("/static/data/dataa.csv");
+            const text = await response.text();
+            const data = Papa.parse(text, { header: true }).data;
+        
+            {% for sensor_name in sensor_names %} 
+                createGraphForSensor('{{ sensor_name }}', data); 
+            {% endfor %}
         }
-    
-        const date = new Date(row.timestamp);
-        const formattedDate = date.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "numeric",
-          day: "numeric",
-          hour: "numeric",
-          minute: "numeric",
-          second: "numeric",
-          hour12: false,
-        });
-        graphData[sensorName].timestamps.push(formattedDate);
-        graphData[sensorName].values.push(row.value);
-      }
+      
+          function createGraphForSensor(sensorName, data) {
+            const filteredData = data.filter(row => row.sensor_name === sensorName);
+            console.log("Filtered data for", sensorName, ":", filteredData); // <-- Добавлено логирование
+            const colorMap = {
+                Temperature: "#2F81F7",
+                Humidity: "#FF6384",
+                Pressure: "#36A2EB",
+                CO2: "#FFCE56",
+                Inside: "#4BC0C0",
+                Outside: "#9966FF",
+                Battery: "#FF9F40"
+            };
+            const datasets = [{
+                label: sensorName,
+                fill: true,
+                data: filteredData.map(row => ({
+                    x: new Date(row.timestamp),
+                    y: parseFloat(row.value)
+                })),
+                borderColor: colorMap[sensorName],
+                backgroundColor: hexToRgba(colorMap[sensorName], 0.3),
+                borderWidth: 2,
+                pointRadius: 2,
+                tension: 0.2,
+            }];
+        
+            let visiblePoints = 20;
+            const ctx = document.getElementById(`${sensorName}Canvas`).getContext("2d");
+            const averageValueElement = document.getElementById(`averageValue-${sensorName}`);
+            const maxValueElement = document.getElementById(`maxValue-${sensorName}`);
+            const minValueElement = document.getElementById(`minValue-${sensorName}`);
+        
+            let chart;
+            function createChart(startIndex) {
+                const endIndex = Math.min(startIndex + visiblePoints, datasets[0].data.length);
+                const visibleValues = datasets[0].data.slice(startIndex, endIndex).map(d => d.y);
+                const average = visibleValues.reduce((sum, value) => sum + value, 0) / visibleValues.length;
+                averageValueElement.textContent = `Average: ${average.toFixed(2)}`; 
+                const max = visibleValues.reduce((maxVal, currentVal) => currentVal > maxVal ? currentVal : maxVal, -Infinity); 
+                maxValueElement.textContent = `Maximum: ${max.toFixed(2)}`;
+                const min = visibleValues.reduce((minVal, currentVal) => currentVal < minVal ? currentVal : minVal, Infinity);
+                minValueElement.textContent = `Minimum: ${min.toFixed(2)}`;
+                const chart = new Chart(ctx, {
+                    type: "line",
+                    data: {
+                        datasets: datasets,
+                    },
+                    options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    pan: {
+                        enabled: true,
+                        mode: 'x',
+                     },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: "top",
+                        },
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            min: datasets[0].data[startIndex].x.getTime(),
+                            max: datasets[0].data[endIndex - 1].x.getTime(),
+                            ticks: {
+                                autoSkip: true,
+                                maxTicksLimit: 10,
+                                callback: function(value, index, values) {
+                                    return new Date(value).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Time'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: sensorName
+                            },
+                            suggestedMin: Math.min(...datasets[0].data.map(d => d.y)) - 2,
+                            suggestedMax: Math.max(...datasets[0].data.map(d => d.y)) + 2,
+                        }
+                    },
+                    pan: {
+                        enabled: true,
+                        mode: 'x',
+                        onPan: function({chart}) {
+                            chart.update('none');
+                        }
+                    },
+                }
+            });
+            return chart;
+        }
 
-       for (const [sensor, sensorData] of Object.entries(graphData)) {
-        const ctx = document.getElementById(`${sensor}Canvas`).getContext("2d");
-        var gradient = ctx.createLinearGradient(0, 0, 0, 400);
-        gradient.addColorStop(0, 'rgba(245,68,54,1)');
-        gradient.addColorStop(0.3, 'rgba(245,68,54,0)');   
-        gradient.addColorStop(1, 'rgba(245,68,54,0)');
-        const chart = new Chart(ctx, {
-          type: "bar",
-          data: {
-            labels: sensorData.timestamps,
-            datasets: [{
-              label: sensor, 
-              fill: true,
-              data: sensorData.values,
-              borderColor: "#f54436",
-
-              backgroundColor: gradient,
-              borderWidth: 2,
-              pointRadius: 4,
-              pointBackgroundColor: "#f54436",
-              pointBorderColor: "#f54436",
-              tension: 0.4,
-              pointRadius: 0,
-            }],
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: {
-                display: false,
-              },
-              tooltips: {
-                enabled: false,
-              },
-              title: {
-                display: false,
-              },
-              point: {
-                enabled: false,
-              },
-            },
-            scales: {
-              x: {
-                border: {
-                  display: false,
-                },
-                grid: {
-                  display: false,
-                },
-                ticks: {
-                  display: false,
-                },
-              },
-              y: {
-                border: {
-                  display: false,
-                },
-                grid: {
-                  display: false,
-                },
-                ticks: {
-                  display: false,
-                },
-              },
-            },
-          },
-        });
-      }
+        chart = createChart(datasets[0].data.length - visiblePoints);
     }
-    
-    getData();
-    
-
-function processTooltipModel(model) {
-  if (!model.body) {
-    return;
-  }
-  const tooltip = document.getElementById("tooltip");
-  tooltip.style.left = model.caretX + "px";
-  tooltip.style.top = model.caretY - 66 - 5 + "px";
-  tooltip.style.display = "block";
-  tooltip.querySelector(".tooltip-label").textContent = model.dataPoints[0].label;
-  tooltip.querySelector(".tooltip-value .value").textContent = "$" + model.dataPoints[0].value;
-}
+    getDataForAllSensors();
 </script>
 </body>
 </html>

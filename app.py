@@ -15,6 +15,7 @@ import tkinter as tk
 import psutil
 import platform
 import socket 
+import pandas as pd
 import os
 
 def read_settings():
@@ -331,6 +332,9 @@ def overview():
 def charts():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
+    data = pd.read_csv("static/data/dataa.csv")  # Замените на ваш путь к CSV
+    sensor_names = data['sensor_name'].unique()
+    return render_template('charts.html', sensor_names=sensor_names, sensor_data=sensor_data)
     return render_template("charts.html", sensor_data=sensor_data)
 
 @app.route('/sensor_graph/<sensor_name>')
