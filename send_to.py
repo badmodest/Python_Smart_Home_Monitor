@@ -24,7 +24,7 @@ def send_mqtt_message():
         client.disconnect()
         
 window = tk.Tk()
-window.title("отправить в топики")
+window.title("отправит в топиiи")
 window.iconbitmap("static\icon.ico")
 ttk.Label(window, text="IP-адреса брокера:").grid(row=0, column=0, padx=5, pady=5)
 ip_entry = ttk.Entry(window)

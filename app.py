@@ -106,41 +106,24 @@ sensor_data = {
 }
 '''
 data = []
-
-
-
-'''
-def connect_mqtt(client, rc):
-    try:
-        print("Connected with result code "+str(rc))
-
-        is_connected = True
-        for sensor in sensor_data:
-            print(f"RABOTA SENSOR topic/{sensor} ")
-            mqtt_topic = f"topic/{sensor}"
-            print("TOPIC IS........",mqtt_topic)
-            client.subscribe(mqtt_topic)
-        time.sleep(1)
-        if not client.is_connected():
-            is_connected = False
-            print("MQTT client not connected"+str(rc))
-
-    except Exception as e:
-        logging.error(f"MQTT connection failed: {e}")
-        is_connected = False
-
-    if is_connected:
-        print("MQTT client connected:", client.is_connected())
-        
-'''
+device_topics = {
+    "TEST_A_1": ["topic"],
+    "TEST_A_2": ["topic", "totopic"]
+}
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code " + str(rc))
-    for sensor in sensor_data:
-        mqtt_topic = f"topic/{sensor}"
-        client.subscribe(mqtt_topic)
-    client.subscribe(power_state_topic) 
-    client.publish(power_state_topic, " ")
 
+    for device, topics in device_topics.items():
+        for topic in topics:
+            for sensor in sensor_data:
+                mqtt_topic = f"{device}/{topic}/{sensor}"
+                result, mid = client.subscribe(mqtt_topic)
+                if result == 0:
+                    print(f"Subscribed to {mqtt_topic}")
+                else:
+                    print(f"Failed to subscribe to {mqtt_topic}")
+                    #client.publish(power_state_topic, " ")
+last_update_time = datetime.now()
 def on_message(client, userdata, msg):
     global data, last_update_time, current_state
 
@@ -180,53 +163,6 @@ print(mqtt_broker,mqtt_port)
 
 client.loop_start()
 
-
-
-
-"""
-
-# def save_to_csv(sensor_data):
-#     with open('sensor_data.csv', 'w', newline='') as csvfile:
-#         fieldnames = ['Sensor', 'Value', 'Unit']
-#         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-
-#         writer.writeheader()
-#         for sensor, data in sensor_data.items():
-#             writer.writerow({'Sensor': sensor, 'Value': data['value'], 'Unit': data['unit']})
-"""
-
-
-"""
-
-# @app.route('/editor')
-# def editor():
-#     return render_template('editor.html')
-
-# @app.route('/save_card', methods=['POST'])
-# def save_card():
-#     data = request.get_json()
-#     card_name = data.get('name')
-#     card_code = data.get('code')
-
-#     file_path = f'cards/{card_name.lower()}.yaml'
-#     with open(file_path, 'w') as file:
-#         file.write(card_code)
-
-#     return jsonify({'success': True, 'message': 'Карточка успешно сохранена'})
-
-"""
-
-"""
-client = mqtt.Client(client_id="iMAC")
-client.on_message = on_connect
-client.on_message = on_message
-if on_message:
-#client.connect(mqtt_broker, mqtt_port, 60)
-client.connect("localhost", 1883, 60)
-print(mqtt_broker,mqtt_port)
-client.loop_start()
-#client.loop_forever()
-"""
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -314,13 +250,36 @@ def index():
         print("свич стейт",switch_state)
         if switch_state == "on":
             client.publish(power_command_topic, "ON")
-            print("VKLUCHAUUUU")
+            current_state = "on"  # Оновлення стану
         elif switch_state == "off":
             client.publish(power_command_topic, "OFF")
-            print("OFFFFFFFFFFFFF")
+            current_state = "off"  # Оновлення стану
     temp = sensor_data['Temp Outside']['value']
     print("TEMP IS",temp)
     return render_template("index.html", sensor_data=sensor_data, hello_username=hello_username, is_guest=is_guest, status=status, state=current_state, temp=temp, last_value=22)
+
+@app.route('/toggle_switch', methods=['POST'])
+def toggle_switch():
+    session['switch_state'] = request.json.get("switch")
+    global current_state
+    switch_state = request.json.get("switch")
+    if switch_state == "on":
+        client.publish(power_command_topic, "ON")
+        current_state = "on"
+    elif switch_state == "off":
+        client.publish(power_command_topic, "OFF")
+        current_state = "off"
+    return jsonify({"state": session['switch_state']})
+
+@app.route('/get_switch_state')
+def get_switch_state():
+    return jsonify({"state": session.get('switch_state', 'off')})
+
+
+@app.route('/get_temperature')
+def get_temperature():
+    temperature = sensor_data['Temp_Inside']['value']
+    return jsonify({"temperature": temperature})
 
 @app.route("/overview")
 def overview():
@@ -332,7 +291,7 @@ def overview():
 def charts():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
-    data = pd.read_csv("static/data/dataa.csv")  # Замените на ваш путь к CSV
+    data = pd.read_csv("static/data/dataa.csv")
     sensor_names = data['sensor_name'].unique()
     return render_template('charts.html', sensor_names=sensor_names, sensor_data=sensor_data)
     return render_template("charts.html", sensor_data=sensor_data)
@@ -341,31 +300,6 @@ def charts():
 def sensor_graph(sensor_name):
     return render_template('sensor_graph.html', sensor_name=sensor_name )
 
-
-
-'''
-@app.route("/settings", methods=['GET', 'POST'])
-def settings_route():
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
-
-    if request.method == 'POST':
-        mqtt_broker = request.form['mqtt_broker']
-        mqtt_port = request.form['mqtt_port']
-
-        settings = read_settings()
-        settings['mqtt_broker'] = mqtt_broker
-        settings['mqtt_port'] = mqtt_port
-        
-        save_settings(settings)
-
-        return redirect(url_for('index'))
-    else:
-        mqtt_settings = read_settings()
-        topic_settings = read_topic_settings()
-        return render_template("settings.html", mqtt_broker=mqtt_settings['mqtt_broker'],
-                               mqtt_port=mqtt_settings['mqtt_port'], topic_settings=topic_settings, sensor_data=sensor_data)
-        '''
         
 @app.route("/settings", methods=['GET', 'POST'])
 def settings_route():

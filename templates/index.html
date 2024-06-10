@@ -45,7 +45,7 @@
     {% endif %}
   </div>
   <div class="content">
-    <h3 class="heading">Hey, {{ hello_username }} 👋 Yur device is <span id="status" data-status="{{ status }}">{{ status }}</span></h3>
+    <div class="heading"><h3 class="movee">Hey, {{ hello_username }} 👋 Yur device is <span id="status" data-status="{{ status }}">{{ status }}</span></h3></div>
     <hr class="rounded">
     
     <div class="grid-container"  id="agg">
@@ -73,7 +73,7 @@
   
       const temperatureDescription = document.getElementById('temperature-description');
       const temperatureEmoji = document.getElementById('temperature-emoji');
-      {% if temp >= 25 %}
+      {% if temp >= 28 %}
       temperatureDescription.textContent = "It's hot";
       temperatureEmoji.textContent = ";_;";
   {% elif temp >= 15 %}
@@ -119,7 +119,7 @@
 
       <div class="big-card">
         <div class="slider-container">
-          <label for="switch">Toggle: On/Off</label>
+          <label for="switch">Manual toggle</label>
           <input type="checkbox" id="switch" class="switch" onchange="toggleSwitch(this)" {% if current_state == "ON" %}checked{% endif %}> 
       </div>
     </div>
@@ -129,68 +129,132 @@
     <div class="big-card somer-color">
       <h2 class="somer-color">Set prefered temperature</h2>
       <div class="seekbar-container">
-        <input type="range" min="0" max="100" value="{{ last_value }}" class="seekbar" id="{{ sensor_name }}Seekbar">
-        <div class="seekbar-value" id="{{ sensor }}SeekbarValue"></div> </div>
+        <input type="range" min="0" max="100" value="{{ last_value }}" class="seekbar" id="{{ Temp_Inside }}Seekbar">
+        <div class="seekbar-value" id="{{ Temp_Inside }}SeekbarValue"></div> </div>
     </div>
     <div class="big-card">
       <div class="slider-container">
-        <label for="switch">Toggle: On/Off</label>
-        <input type="checkbox" id="switch" class="switch" onchange="toggleSwitch(this)" {% if current_state == "ON" %}checked{% endif %}> 
+        <label for="2_switch">Toggle control</label>
+        <input type="checkbox" id="2_switch" class="2_switch" onchange="control_toggleSwitch(this)" {% if current_state == "ON" %}checked{% endif %}> 
     </div>
   </div>
 </div>
 </div>
 </div>
       <script>
-      const checkbox = document.getElementById("switch");
-      
-function toggleSwitch(checkbox) {
-    const state = checkbox.checked ? "on" : "off";
-    fetch("/", {  // Отправка состояния переключателя на '/'
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `switch=${state}`
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok.');
+        const checkbox = document.getElementById("switch");
+        const seekbar = document.getElementById("{{ Temp_Inside }}Seekbar");
+        const seekbarValue = document.getElementById("{{ Temp_Inside }}SeekbarValue");
+        const controlSwitch = document.getElementById("2_switch");
+        
+        let controlTimeout;
+        
+        // Функція для оновлення позиції значення seekbar
+        function updateSeekbarValuePosition() {
+          const value = seekbar.value;
+          const percent = (value / seekbar.max) * 100;
+          const seekbarRect = seekbar.getBoundingClientRect();
+          const offset = (percent / 100) * seekbarRect.width - seekbarValue.offsetWidth / 2;
+          seekbarValue.style.left = `${offset}px`;
         }
-        return response.text();
-    })
-    .then(data => {
-        console.log('Success:', data); 
-    })
-    .catch(error => {
-        console.error('There has been a problem with your fetch operation:', error);
-        checkbox.checked = !checkbox.checked; 
-    });
-    function toggleSwitch(checkbox) {
-      const state = checkbox.checked ? "on" : "off";
-      fetch("/", {  // Отправка состояния переключателя на '/'
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: `switch=${state}`
-      })
-      .then(response => {
-          if (!response.ok) {
+        
+        // Завантаження збереженого значення seekbar
+        const savedValue = localStorage.getItem("desiredTemperature");
+        if (savedValue) {
+          seekbar.value = savedValue;
+          seekbarValue.textContent = savedValue;
+          updateSeekbarValuePosition();
+        }
+        
+        seekbar.addEventListener('input', function() {
+          const value = this.value;
+          seekbarValue.textContent = value;
+          updateSeekbarValuePosition();
+          localStorage.setItem("desiredTemperature", value);
+        });
+        
+        // Функція для перемикання реле
+        async function toggleSwitch(checkbox, state) {
+          try {
+            const response = await fetch("/toggle_switch", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ switch: state ? "on" : "off" }),
+            });
+        
+            if (!response.ok) {
               throw new Error('Network response was not ok.');
+            }
+        
+            const data = await response.json();
+            console.log('Success:', data);
+            checkbox.checked = data.state === "on";
+          } catch (error) {
+            console.error('There has been a problem with your fetch operation:', error);
+            checkbox.checked = !checkbox.checked;
           }
-          return response.text();
-      })
-      .then(data => {
-          console.log('Success:', data); 
-      })
-      .catch(error => {
-          console.error('There has been a problem with your fetch operation:', error);
-          checkbox.checked = !checkbox.checked; 
-      });
+        }
+        
+        // Функція для перевірки температури та керування реле
+        async function checkTemperatureAndControlRelay() {
+          if (!controlSwitch.checked) return;
+        
+          try {
+            const response = await fetch("/get_temperature");
+            if (!response.ok) {
+              throw new Error('Network response was not ok.');
+            }
+            const data = await response.json();
+            const currentTemperature = data.temperature;
+            const desiredTemperature = parseInt(seekbar.value, 10);
+        
+            if (currentTemperature < desiredTemperature && checkbox.checked !== true) {
+              await toggleSwitch(checkbox, true);
+            } else if (currentTemperature >= desiredTemperature && checkbox.checked !== false) {
+              await toggleSwitch(checkbox, false);
+            }
+          } catch (error) {
+            console.error('Error fetching temperature:', error);
+          }
+        
+          controlTimeout = setTimeout(checkTemperatureAndControlRelay, 30000);
+        }
+        
+        // Обробник події change для controlSwitch
+        controlSwitch.addEventListener('change', function() {
+          if (this.checked) {
+            checkTemperatureAndControlRelay();
+          } else {
+            clearTimeout(controlTimeout);
+          }
+        });
+        
+        // Обробник події change для checkbox
+        checkbox.addEventListener('change', function() {
+          toggleSwitch(this, this.checked);
+        });
+        
+        // Отримуємо початковий стан при завантаженні сторінки
+        window.addEventListener('load', async () => {
+          try {
+            const response = await fetch("/get_switch_state");
+            if (!response.ok) {
+              throw new Error('Network response was not ok.');
+            }
+            const data = await response.json();
+            checkbox.checked = data.state === "on";
+        
+            // Якщо controlSwitch увімкнений, запускаємо перевірку температури
+            if (controlSwitch.checked) {
+              checkTemperatureAndControlRelay();
+            }
+          } catch (error) {
+            console.error('Error fetching switch state:', error);
+          }
+        });
       </script>
     </div>
-    
-
-    
     </div>
-
     </div>
   </div>
 
@@ -216,7 +280,6 @@ function toggleSwitch(checkbox) {
     setInterval(updateDateTime, 1000); 
 
     var status = document.getElementById("status").getAttribute("data-status");
-    console.log("Уведомление было кликнуто.");
     function updateData() {
       if (status !== "Offline") {
         fetch('/data')
@@ -224,7 +287,7 @@ function toggleSwitch(checkbox) {
             if (response.ok) {
               return response.json();
             } else {
-              throw new Error('Ошибка при получении данных');
+              throw new Error('Помилка отримки данних');
             }
           })
           .then(data => {
@@ -309,11 +372,8 @@ function toggleSwitch(checkbox) {
   checkDataAndAlert();
   setInterval(checkDataAndAlert, 60000);
 
-  const seekbar = document.getElementById("{{ sensor }}Seekbar");
-const seekbarValue = document.getElementById("{{ sensor }}SeekbarValue");
 
 seekbar.addEventListener('input', function() {
-    // код для назначения текущей этой ну той ...
 
     const value = this.value;
     seekbarValue.textContent = value;
@@ -323,7 +383,6 @@ seekbar.addEventListener('input', function() {
     const offset = (percent / 100) * seekbarRect.width - seekbarValue.offsetWidth / 2;
     seekbarValue.style.left = `${offset}px`;
 });
-
 
 </script>
 </body>

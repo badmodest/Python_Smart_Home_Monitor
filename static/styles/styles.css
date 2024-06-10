@@ -21,7 +21,7 @@
   --d_lavander:        #564f66;
   --pinky:             #B7907F;
   --d_pinky:           #493831;
-  --cyan:              #9dcbc9;
+  --cyan:              #68a1f1d2;
   --d_cyan:            #146964;
   --yellow:            #e69677;
   --d_yellow:          #643a29e7;
@@ -98,14 +98,22 @@ body {
   justify-content: space-between;
   padding: 2% 2% 2% 1.3%;
 }
+
+.movee{
+ padding-left: 25px;
+ padding-bottom: 20px;
+ margin-block: auto;
+}
 .heading {
   position: sticky;
   top: 10px;
   height: 5%;
+  width: 100%;
+  margin-left: -35px;  
   margin-top: 10px;
   padding: 10px;
   padding-top: 30px;
-  background-color: #ffffff;
+  background-color: #1a1a1a;
   z-index: 10; 
 backdrop-filter: blur(10px);
 -webkit-backdrop-filter: blur(10px);
