@@ -7,7 +7,12 @@
         <img src="./static/favicon.ico" alt="Logo" width="100" height="100">
     </div>
 
-### *Smart Home Monitor*
+### *Smart Home Monitor WIP*
+
+
+# <span style="color:red">PROJECT SUSPENDED</span>
+
+
 
 ## 👋Overview
 
